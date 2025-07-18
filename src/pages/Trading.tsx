@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { TrendingUp, TrendingDown, BarChart3, Zap, Bot, Target, Clock, DollarSign } from "lucide-react";
+import { SymbolSelector } from "@/components/SymbolSelector";
 
 // TradingView Chart Placeholder
 const TradingViewChart = () => (
@@ -100,12 +102,35 @@ export default function Trading() {
   const [takeProfit, setTakeProfit] = useState("");
   const [autoBotEnabled, setAutoBotEnabled] = useState(true);
 
+  // New: State for signals and backtest
+  const [signals, setSignals] = useState([]);
+  const [signalsLoading, setSignalsLoading] = useState(true);
+  const [backtest, setBacktest] = useState(null);
+  const [backtestLoading, setBacktestLoading] = useState(true);
+
+  const [symbol, setSymbol] = useState("BTCUSDT");
   const currentPrice = 67340;
   const balance = 11200.50;
+
+  useEffect(() => {
+    setSignalsLoading(true);
+    axios.get(`/api/signals/${symbol}`)
+      .then(res => setSignals(res.data || []))
+      .catch(() => setSignals([]))
+      .finally(() => setSignalsLoading(false));
+    setBacktestLoading(true);
+    axios.get(`/api/backtest/${symbol}`)
+      .then(res => setBacktest(res.data))
+      .catch(() => setBacktest(null))
+      .finally(() => setBacktestLoading(false));
+  }, [symbol]);
 
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-[1800px] mx-auto space-y-6">
+        <div className="flex items-center justify-between mb-4">
+          <SymbolSelector value={symbol} onChange={setSymbol} />
+        </div>
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -183,6 +208,62 @@ export default function Trading() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* --- New: Trading Signals & Explanations Section --- */}
+            <Card className="bg-gradient-card border-border/50 shadow-card">
+              <CardHeader>
+                <CardTitle className="text-foreground flex items-center gap-2">
+                  <Bot className="w-5 h-5 text-primary animate-pulse" />
+                  AI Trading Signals & Explanations
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {signalsLoading ? (
+                  <div className="text-muted-foreground">Loading signals...</div>
+                ) : signals.length === 0 ? (
+                  <div className="text-muted-foreground">No signals available.</div>
+                ) : (
+                  <div className="space-y-4">
+                    {signals.map((sig, idx) => (
+                      <div key={sig._id || idx} className="p-4 rounded-lg border border-border/50 bg-muted/20">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Badge variant={sig.signal === "BUY" ? "default" : sig.signal === "SELL" ? "destructive" : "secondary"} className={sig.signal === "BUY" ? "bg-gradient-success" : sig.signal === "SELL" ? "bg-destructive" : ""}>
+                            {sig.signal}
+                          </Badge>
+                          <span className="font-mono text-sm text-foreground">{new Date(sig.open_time).toLocaleString()}</span>
+                          <span className="text-xs text-muted-foreground ml-2">Close: ${sig.close}</span>
+                        </div>
+                        <div className="text-xs text-muted-foreground mb-1">RSI: {sig.rsi} | MACD: {sig.macd} | MACD Diff: {sig.macd_diff}</div>
+                        <div className="text-sm text-foreground font-medium">{sig.explanation}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+            {/* --- New: Backtest Results Section --- */}
+            <Card className="bg-gradient-card border-border/50 shadow-card">
+              <CardHeader>
+                <CardTitle className="text-foreground flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-primary" />
+                  Backtest Results
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {backtestLoading ? (
+                  <div className="text-muted-foreground">Loading backtest...</div>
+                ) : !backtest ? (
+                  <div className="text-muted-foreground">No backtest results available.</div>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="text-sm text-foreground font-semibold">Final Balance: ${backtest.final_balance?.toLocaleString(undefined, {maximumFractionDigits:2})}</div>
+                    <div className="text-xs text-muted-foreground">Total Trades: {backtest.trades?.length}</div>
+                    <img src="/equity_curve.png" alt="Equity Curve" className="w-full max-w-xl rounded-lg border mt-2" />
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+            {/* --- End New Sections --- */}
           </div>
 
           {/* Trading Panel */}

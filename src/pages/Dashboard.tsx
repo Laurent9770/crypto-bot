@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TrendingUp, TrendingDown, DollarSign, BarChart3, Users, Activity, Wallet, Bot, Target, Zap } from "lucide-react";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, AreaChart, Area } from "recharts";
+import { useNavigate } from "react-router-dom";
 
 // Mock data for charts
 const portfolioData = [
@@ -29,6 +30,7 @@ const tradingPerformanceData = [
 
 export default function Dashboard() {
   const [activeBot, setActiveBot] = useState(true);
+  const navigate = useNavigate();
 
   const stats = [
     {
@@ -266,7 +268,7 @@ export default function Dashboard() {
                       <p className="text-sm text-muted-foreground">Confidence: 78% • Wait for breakout</p>
                     </div>
                   </div>
-                  <Button size="sm" variant="outline">Monitor</Button>
+                  <Button size="sm" variant="outline" onClick={() => navigate("/monitor/ethusdt")}>Monitor</Button>
                 </div>
               </div>
             </CardContent>
