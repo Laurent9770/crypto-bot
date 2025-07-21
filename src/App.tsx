@@ -18,6 +18,8 @@ import Support from './pages/Support';
 import About from './pages/About';
 import Contact from './pages/ContactUs';
 import Profile from './pages/Profile';
+import NewsPage from './pages/News';
+import SentimentPage from './pages/Sentiment';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 const queryClient = new QueryClient();
@@ -46,6 +48,8 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/news" element={<NewsPage />} />
+          <Route path="/sentiment" element={<SentimentPage />} />
         </Routes>
       </Router>
     </QueryClientProvider>

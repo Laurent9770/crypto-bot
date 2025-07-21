@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Star, Crown, Zap } from "lucide-react";
-import pricingBg from '@/assets/backgrounds/pricing.jpg';
+
 
 const plans = [
   {

@@ -41,6 +41,8 @@ export default function Header() {
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuItem asChild><Link to="/features">Features</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/news">News</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/sentiment">Sentiment</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/docs">Docs</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/support">Support</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/about">About</Link></DropdownMenuItem>
