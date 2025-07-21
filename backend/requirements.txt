@@ -5,3 +5,4 @@ eventlet==0.33.3
 pymongo==4.7.2
 python-dotenv==1.0.1
 gunicorn==21.2.0
+dnspython==2.6.1
