@@ -43,7 +43,7 @@ export default function Profile() {
     email: "alex@example.com",
     plan: "Premium",
     joinDate: "March 2024",
-    avatar: "",
+    avatar: "/placeholder.svg", // Use local placeholder
     balance: "$11,200.50",
     totalTrades: 1247,
     winRate: "82%",
@@ -176,7 +176,7 @@ export default function Profile() {
               <div className="flex items-center gap-6">
                 <Avatar className="w-20 h-20 border-2 border-primary/20">
                   <AvatarImage src={userInfo.avatar} alt={userInfo.name} />
-                  <AvatarFallback className="text-xl bg-gradient-primary text-primary-foreground">
+                  <AvatarFallback>
                     {userInfo.name.split(' ').map(n => n[0]).join('')}
                   </AvatarFallback>
                 </Avatar>
