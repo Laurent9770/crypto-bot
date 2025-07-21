@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import { NewsCard, NewsArticle } from '@/components/NewsCard';
 
-const socket = io('http://localhost:5000');
+const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+const socket = io(VITE_BACKEND_URL);
 
 const News = () => {
   const [articles, setArticles] = useState<NewsArticle[]>([]);
