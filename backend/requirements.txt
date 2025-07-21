@@ -8,3 +8,4 @@ gunicorn==21.2.0
 dnspython==2.6.1
 Flask-Bcrypt
 PyJWT
+setuptools
