@@ -18,4 +18,6 @@ export default defineConfig({
       },
     },
   },
-}); 
+});
+
+// Trivial change to force a new build 
