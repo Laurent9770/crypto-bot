@@ -57,16 +57,26 @@ def signal_broadcast_loop():
                 news = fetch_real_news()
                 sentiment = fetch_real_sentiment(signal['asset'])
 
-                signal['confidence'] = round(random.uniform(0.7, 0.98), 2)
-                signal['entryPrice'] = round(market_data['price'] * random.uniform(0.99, 1.01), 2)
-                signal['targetPrice'] = round(signal['entryPrice'] * (1 + random.uniform(0.02, 0.08)), 2)
-                signal['stopLoss'] = round(signal['entryPrice'] * (1 - random.uniform(0.01, 0.03)), 2)
+                # Use snake_case keys for all fields
+                signal['confidence_score'] = round(random.uniform(0.7, 0.98), 2)
+                signal['entry_price'] = round(market_data['price'] * random.uniform(0.99, 1.01), 2)
+                signal['target_price'] = round(signal['entry_price'] * (1 + random.uniform(0.02, 0.08)), 2)
+                signal['stop_loss'] = round(signal['entry_price'] * (1 - random.uniform(0.01, 0.03)), 2)
                 signal['timestamp'] = datetime.datetime.utcnow().isoformat() + "Z"
                 signal['reasoning'] = [
                     f"News: {news['headline'][:30]}...",
                     f"Market: Volume at ${market_data['volume']/1e9:.2f}B",
                     f"Sentiment: {sentiment['source']} is {sentiment['trend']}"
                 ]
+                # Ensure trade_type and time_frame are present
+                if 'type' in signal:
+                    signal['trade_type'] = signal['type']
+                if 'timeFrame' in signal:
+                    signal['time_frame'] = signal['timeFrame']
+                # Remove camelCase keys if present
+                for key in ['confidence', 'entryPrice', 'targetPrice', 'stopLoss', 'type', 'timeFrame']:
+                    if key in signal:
+                        del signal[key]
 
             socketio.emit('signal_update', mock_signals)
         socketio.sleep(5)
