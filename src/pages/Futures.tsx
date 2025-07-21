@@ -40,6 +40,7 @@ interface AiSignal {
   reasoning: string[];
   timestamp: string;
   source_urls: string[];
+  id?: string; // Added for feedback
 }
 
 export default function Futures() {
@@ -80,6 +81,12 @@ export default function Futures() {
       : type === "SELL"
       ? "bg-destructive/10 border-destructive/20"
       : "bg-muted/10 border-border/20";
+  };
+
+  const handleVote = (signal: AiSignal, vote: 'up' | 'down') => {
+    axios.post('/api/signal-feedback', { signal_id: signal.id || signal.asset, vote })
+      .then(() => toast({ title: 'Thank you!', description: 'Your feedback has been recorded.' }))
+      .catch(() => toast({ title: 'Error', description: 'Could not record feedback', variant: 'destructive' }));
   };
 
   return (
@@ -194,8 +201,8 @@ export default function Futures() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Button variant="ghost" size="sm"><ThumbsUp className="h-4 w-4" /></Button>
-                          <Button variant="ghost" size="sm"><ThumbsDown className="h-4 w-4" /></Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleVote(signal, 'up')}><ThumbsUp className="h-4 w-4" /></Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleVote(signal, 'down')}><ThumbsDown className="h-4 w-4" /></Button>
                         </div>
                       </div>
                       <div className="grid grid-cols-3 gap-4 my-4 text-sm">

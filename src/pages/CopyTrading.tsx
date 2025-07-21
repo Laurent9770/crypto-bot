@@ -5,6 +5,7 @@ import { ThumbsUp, ThumbsDown, Bot } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useToast } from "@/hooks/use-toast";
 
 interface Trader {
   nickName: string;
@@ -44,6 +45,7 @@ interface AiSignal {
   reasoning: string[];
   timestamp: string;
   source_urls: string[];
+  id?: string; // Added for feedback
 }
 
 export default function CopyTrading() {
@@ -56,6 +58,7 @@ export default function CopyTrading() {
   const [symbol, setSymbol] = useState("BTCUSDT");
   const [aiSignals, setAiSignals] = useState<AiSignal[]>([]);
   const [loadingAi, setLoadingAi] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     async function fetchTraders() {
@@ -94,6 +97,12 @@ export default function CopyTrading() {
       .catch(() => setAiSignals([]))
       .finally(() => setLoadingAi(false));
   }, []);
+
+  const handleVote = (signal: AiSignal, vote: 'up' | 'down') => {
+    axios.post('/api/signal-feedback', { signal_id: signal.id || signal.asset, vote })
+      .then(() => toast({ title: 'Thank you!', description: 'Your feedback has been recorded.' }))
+      .catch(() => toast({ title: 'Error', description: 'Could not record feedback', variant: 'destructive' }));
+  };
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -199,8 +208,8 @@ export default function CopyTrading() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm"><ThumbsUp className="h-4 w-4" /></Button>
-                        <Button variant="ghost" size="sm"><ThumbsDown className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleVote(signal, 'up')}><ThumbsUp className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleVote(signal, 'down')}><ThumbsDown className="h-4 w-4" /></Button>
                       </div>
                     </div>
                     <div className="grid grid-cols-3 gap-4 my-4 text-sm">
