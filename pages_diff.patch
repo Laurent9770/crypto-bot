@@ -1,0 +1,1004 @@
+diff --git a/src/pages/APIAccess.tsx b/src/pages/APIAccess.tsx
+index 2b0b5059..23bc89a9 100644
+--- a/src/pages/APIAccess.tsx
++++ b/src/pages/APIAccess.tsx
+@@ -16,220 +16,11 @@ const platforms = [
+   { name: "Kucoin", type: "exchange" },
+ ];
+ 
+-const APIAccess: React.FC = () => {
+-  const [apiKey, setApiKey] = useState("");
+-  const [usage, setUsage] = useState(0);
+-  const [recentCalls, setRecentCalls] = useState<any[]>([]);
+-  const [loading, setLoading] = useState(true);
+-  const [connectModal, setConnectModal] = useState<{
+-    open: boolean;
+-    platform: string | null;
+-  }>({ open: false, platform: null });
+-  const [connections, setConnections] = useState<{ [platform: string]: boolean }>({});
+-  const [walletAddress, setWalletAddress] = useState<{ [platform: string]: string | null }>({});
+-
+-  useEffect(() => {
+-    fetch(`${import.meta.env.VITE_API_URL}/api/api_keys`)
+-      .then((res) => (res.ok ? res.json() : Promise.reject(res)))
+-      .then((data) => setApiKey(data.key || ""))
+-      .catch(() => setApiKey("Error loading API key"));
+-
+-    fetch(`${import.meta.env.VITE_API_URL}/api/api_usage`)
+-      .then((res) => (res.ok ? res.json() : Promise.reject(res)))
+-      .then((data) => {
+-        setUsage(data.usage || 0);
+-        setRecentCalls(data.recent || []);
+-        setLoading(false);
+-      })
+-      .catch(() => {
+-        setLoading(false);
+-        setUsage(0);
+-        setRecentCalls([]);
+-      });
+-  }, []);
+-
+-  const handleConnect = async (platform: string) => {
+-    if (platform === "MetaMask" && window.ethereum) {
+-      try {
+-        const accounts = await window.ethereum.request({
+-          method: "eth_requestAccounts",
+-        });
+-        setWalletAddress({ ...walletAddress, [platform]: accounts[0] });
+-        setConnections({ ...connections, [platform]: true });
+-        setConnectModal({ open: false, platform: null });
+-      } catch (err) {
+-        alert("MetaMask connection failed.");
+-      }
+-      return;
+-    }
+-
+-    if (platform === "Trust Wallet") {
+-      const provider = await EthereumProvider.init({
+-        projectId: "YOUR_PROJECT_ID", // Replace with real projectId
+-        chains: [1],
+-        showQrModal: true,
+-      });
+-      await provider.enable();
+-      setWalletAddress({ ...walletAddress, [platform]: provider.accounts[0] });
+-      setConnections({ ...connections, [platform]: true });
+-      setConnectModal({ open: false, platform: null });
+-      return;
+-    }
+-
+-    // Open API modal for exchanges
+-    setConnectModal({ open: true, platform });
+-  };
+-
+-  const handleDisconnect = (platform: string) => {
+-    setConnections({ ...connections, [platform]: false });
+-    setWalletAddress({ ...walletAddress, [platform]: null });
+-  };
+-
+-  const handleConnectSubmit = (
+-    platform: string,
+-    apiKey?: string,
+-    apiSecret?: string
+-  ) => {
+-    // Simulate successful connection
+-    setConnections({ ...connections, [platform]: true });
+-    setConnectModal({ open: false, platform: null });
+-  };
+-
++const APIAccess = () => {
+   return (
+-    <div className="max-w-4xl mx-auto py-16 px-4">
+-      <h1 className="text-3xl md:text-4xl font-bold mb-6 text-primary">API Access</h1>
+-
+-      {loading ? (
+-        <div>Loading API data...</div>
+-      ) : apiKey === "Error loading API key" ? (
+-        <div className="text-destructive font-semibold">
+-          Failed to load API key. Backend may be down.
+-        </div>
+-      ) : (
+-        <>
+-          <div className="mb-8">
+-            <div className="font-semibold">Your API Key:</div>
+-            <div className="bg-muted p-2 rounded font-mono break-all mb-2">{apiKey}</div>
+-            <div className="text-sm text-muted-foreground">Usage: {usage} calls</div>
+-          </div>
+-
+-          <div className="mb-8">
+-            <h2 className="text-xl font-bold mb-4">Recent API Calls</h2>
+-            <ul className="text-xs space-y-1">
+-              {recentCalls.map((call, i) => (
+-                <li key={i}>
+-                  <strong>{call.endpoint}</strong> - {call.timestamp}
+-                </li>
+-              ))}
+-            </ul>
+-          </div>
+-
+-          <div className="mb-8">
+-            <h2 className="text-xl font-bold mb-4">Connect Your Wallets & Exchanges</h2>
+-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+-              {platforms.map((p) => (
+-                <div
+-                  key={p.name}
+-                  className="flex items-center justify-between p-4 border rounded-lg bg-card/40"
+-                >
+-                  <span className="font-semibold">{p.name}</span>
+-                  {connections[p.name] ? (
+-                    <div className="flex flex-col gap-1 items-end">
+-                      {walletAddress[p.name] && (
+-                        <span className="text-xs text-muted-foreground">
+-                          {walletAddress[p.name]}
+-                        </span>
+-                      )}
+-                      <button
+-                        className="text-destructive underline text-xs"
+-                        onClick={() => handleDisconnect(p.name)}
+-                      >
+-                        Disconnect
+-                      </button>
+-                    </div>
+-                  ) : (
+-                    <button
+-                      className="bg-primary text-primary-foreground px-4 py-2 rounded font-semibold hover:bg-primary/80"
+-                      onClick={() => handleConnect(p.name)}
+-                    >
+-                      Connect
+-                    </button>
+-                  )}
+-                </div>
+-              ))}
+-            </div>
+-          </div>
+-
+-          {/* Connect Modal */}
+-          <Dialog
+-            open={connectModal.open}
+-            onOpenChange={(open) =>
+-              setConnectModal({ open, platform: connectModal.platform })
+-            }
+-          >
+-            <DialogContent>
+-              <DialogHeader>
+-                <DialogTitle>
+-                  Connect to {connectModal.platform}
+-                </DialogTitle>
+-              </DialogHeader>
+-
+-              {connectModal.platform &&
+-              platforms.find((p) => p.name === connectModal.platform)?.type ===
+-                "wallet" ? (
+-                <div className="space-y-4">
+-                  <p>
+-                    To connect your {connectModal.platform}, use your wallet
+-                    app or extension.
+-                  </p>
+-                  <button
+-                    className="bg-primary text-white px-4 py-2 rounded w-full"
+-                    onClick={() =>
+-                      handleConnectSubmit(connectModal.platform!)
+-                    }
+-                  >
+-                    Simulate Wallet Connect
+-                  </button>
+-                </div>
+-              ) : (
+-                <div className="space-y-4">
+-                  <p>
+-                    Enter your <strong>API Key</strong> and{" "}
+-                    <strong>API Secret</strong> for{" "}
+-                    {connectModal.platform}:
+-                  </p>
+-                  <input
+-                    type="text"
+-                    placeholder="API Key"
+-                    className="w-full border rounded p-2"
+-                    id="apiKeyInput"
+-                  />
+-                  <input
+-                    type="password"
+-                    placeholder="API Secret"
+-                    className="w-full border rounded p-2"
+-                    id="apiSecretInput"
+-                  />
+-                  <button
+-                    className="bg-primary text-white px-4 py-2 rounded w-full"
+-                    onClick={() => {
+-                      const apiKey = (
+-                        document.getElementById("apiKeyInput") as HTMLInputElement
+-                      )?.value;
+-                      const apiSecret = (
+-                        document.getElementById("apiSecretInput") as HTMLInputElement
+-                      )?.value;
+-                      handleConnectSubmit(connectModal.platform!, apiKey, apiSecret);
+-                    }}
+-                  >
+-                    Connect
+-                  </button>
+-                </div>
+-              )}
+-            </DialogContent>
+-          </Dialog>
+-        </>
+-      )}
++    <div className="container mx-auto p-4">
++      <h1 className="text-2xl font-bold mb-4">API Access</h1>
++      <p>This is a placeholder for the API access and documentation page.</p>
+     </div>
+   );
+ };
+diff --git a/src/pages/Copy.tsx b/src/pages/Copy.tsx
+index c0520044..e7f30bf2 100644
+--- a/src/pages/Copy.tsx
++++ b/src/pages/Copy.tsx
+@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
+ import { SignalCard, TradingSignal } from "@/components/trading/SignalCard";
+ import io from "socket.io-client";
+ 
+-const socket = io("http://localhost:5000");
++const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
++const socket = io(VITE_BACKEND_URL);
+ 
+ const Copy = () => {
+   const [signals, setSignals] = useState<TradingSignal[]>([]);
+diff --git a/src/pages/Dashboard.tsx b/src/pages/Dashboard.tsx
+index 217736b9..64025d19 100644
+--- a/src/pages/Dashboard.tsx
++++ b/src/pages/Dashboard.tsx
+@@ -1,210 +1,10 @@
+-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+-import { Badge } from "@/components/ui/badge";
+-import { Button } from "@/components/ui/button";
+-import { TrendingUp, TrendingDown, DollarSign, Target, Zap, Activity, ArrowUpRight, ArrowDownRight } from "lucide-react";
+-// import { SignalCard, type TradingSignal } from "@/components/trading/SignalCard";
+-// import { mockSignals } from "@/lib/mockData";
+-
+-// Temporary mock data and SignalCard for demonstration
+-const mockSignals = [
+-  { id: 1, asset: "BTC/USDT", action: "Buy", confidence: 0.93, entry: 67000, target: 69000, stop: 66000 },
+-  { id: 2, asset: "ETH/USDT", action: "Sell", confidence: 0.91, entry: 3500, target: 3200, stop: 3600 },
+-  { id: 3, asset: "SOL/USDT", action: "Hold", confidence: 0.88, entry: 150, target: 170, stop: 140 },
+-  { id: 4, asset: "ADA/USDT", action: "Buy", confidence: 0.90, entry: 0.45, target: 0.55, stop: 0.40 },
+-  { id: 5, asset: "XRP/USDT", action: "Sell", confidence: 0.87, entry: 0.60, target: 0.50, stop: 0.65 },
+-  { id: 6, asset: "BNB/USDT", action: "Buy", confidence: 0.92, entry: 320, target: 350, stop: 310 },
+-];
+-
+-function SignalCard({ signal }: any) {
+-  return (
+-    <Card className="border-primary/20">
+-      <CardHeader className="flex flex-row items-center justify-between pb-2">
+-        <CardTitle className="text-base font-medium">{signal.asset}</CardTitle>
+-        <Badge className={signal.action === "Buy" ? "bg-success" : signal.action === "Sell" ? "bg-destructive" : "bg-muted-foreground"}>{signal.action}</Badge>
+-      </CardHeader>
+-      <CardContent className="space-y-2">
+-        <div className="flex items-center gap-2 text-sm">
+-          <span>Confidence:</span>
+-          <span className="font-bold">{(signal.confidence * 100).toFixed(0)}%</span>
+-        </div>
+-        <div className="flex justify-between text-xs">
+-          <div>Entry: <span className="font-mono">{signal.entry}</span></div>
+-          <div>Target: <span className="font-mono">{signal.target}</span></div>
+-          <div>Stop: <span className="font-mono">{signal.stop}</span></div>
+-        </div>
+-      </CardContent>
+-    </Card>
+-  );
+-}
+-
+-export default function Dashboard() {
+-  const topSignals = mockSignals.slice(0, 6);
+-  
+-  const stats = {
+-    totalSignals: 247,
+-    accuracy: 89.5,
+-    profit: 12750,
+-    activePositions: 8
+-  };
+-
+-  const recentPerformance = [
+-    { asset: "BTC/USDT", profit: 1250, percentage: 12.5, type: "profit" },
+-    { asset: "ETH/USDT", profit: 850, percentage: 8.3, type: "profit" },
+-    { asset: "SOL/USDT", profit: -320, percentage: -3.2, type: "loss" },
+-    { asset: "ADA/USDT", profit: 420, percentage: 4.1, type: "profit" },
+-  ];
+-
++const Dashboard = () => {
+   return (
+-    <div className="space-y-6 animate-fade-in">
+-      {/* Header */}
+-      <div>
+-        <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+-          Trading Dashboard
+-        </h1>
+-        <p className="text-muted-foreground mt-2">
+-          AI-powered trading signals and market intelligence
+-        </p>
+-      </div>
+-
+-      {/* Stats Grid */}
+-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+-        <Card className="bg-gradient-success/10 border-success/20">
+-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+-            <CardTitle className="text-sm font-medium">Total Signals</CardTitle>
+-            <Activity className="h-4 w-4 text-success" />
+-          </CardHeader>
+-          <CardContent>
+-            <div className="text-2xl font-bold text-success">{stats.totalSignals}</div>
+-            <p className="text-xs text-muted-foreground">
+-              +12 from yesterday
+-            </p>
+-          </CardContent>
+-        </Card>
+-
+-        <Card className="bg-gradient-primary/10 border-primary/20">
+-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+-            <CardTitle className="text-sm font-medium">Accuracy Rate</CardTitle>
+-            <Target className="h-4 w-4 text-primary" />
+-          </CardHeader>
+-          <CardContent>
+-            <div className="text-2xl font-bold text-primary">{stats.accuracy}%</div>
+-            <p className="text-xs text-muted-foreground">
+-              +2.3% this week
+-            </p>
+-          </CardContent>
+-        </Card>
+-
+-        <Card className="bg-gradient-warning/10 border-warning/20">
+-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+-            <CardTitle className="text-sm font-medium">Portfolio Value</CardTitle>
+-            <DollarSign className="h-4 w-4 text-warning" />
+-          </CardHeader>
+-          <CardContent>
+-            <div className="text-2xl font-bold text-warning">${stats.profit.toLocaleString()}</div>
+-            <p className="text-xs text-muted-foreground">
+-              +15.2% this month
+-            </p>
+-          </CardContent>
+-        </Card>
+-
+-        <Card className="bg-gradient-danger/10 border-danger/20">
+-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+-            <CardTitle className="text-sm font-medium">Active Positions</CardTitle>
+-            <Zap className="h-4 w-4 text-danger" />
+-          </CardHeader>
+-          <CardContent>
+-            <div className="text-2xl font-bold text-danger">{stats.activePositions}</div>
+-            <p className="text-xs text-muted-foreground">
+-              3 profitable, 2 pending
+-            </p>
+-          </CardContent>
+-        </Card>
+-      </div>
+-
+-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+-        {/* Top Signals */}
+-        <div className="lg:col-span-2 space-y-6">
+-          <div className="flex items-center justify-between">
+-            <h2 className="text-xl font-semibold">Top Signals Today</h2>
+-            <Button variant="outline" size="sm">
+-              View All
+-            </Button>
+-          </div>
+-          
+-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+-            {topSignals.map((signal) => (
+-              <SignalCard key={signal.id} signal={signal} />
+-            ))}
+-          </div>
+-        </div>
+-
+-        {/* Recent Performance */}
+-        <div className="space-y-6">
+-          <h2 className="text-xl font-semibold">Recent Performance</h2>
+-          
+-          <Card>
+-            <CardHeader>
+-              <CardTitle className="text-base">Position History</CardTitle>
+-            </CardHeader>
+-            <CardContent className="space-y-4">
+-              {recentPerformance.map((item, index) => (
+-                <div key={index} className="flex items-center justify-between">
+-                  <div className="flex items-center gap-3">
+-                    <div className={`p-2 rounded-lg ${
+-                      item.type === "profit" ? "bg-success/10" : "bg-danger/10"
+-                    }`}>
+-                      {item.type === "profit" ? (
+-                        <ArrowUpRight className="h-4 w-4 text-success" />
+-                      ) : (
+-                        <ArrowDownRight className="h-4 w-4 text-danger" />
+-                      )}
+-                    </div>
+-                    <div>
+-                      <p className="font-medium text-sm">{item.asset}</p>
+-                      <p className="text-xs text-muted-foreground">
+-                        {item.type === "profit" ? "Closed" : "Stop Loss"}
+-                      </p>
+-                    </div>
+-                  </div>
+-                  <div className="text-right">
+-                    <p className={`font-medium text-sm ${
+-                      item.type === "profit" ? "text-success" : "text-danger"
+-                    }`}>
+-                      {item.profit > 0 ? "+" : ""}${item.profit}
+-                    </p>
+-                    <p className={`text-xs ${
+-                      item.type === "profit" ? "text-success" : "text-danger"
+-                    }`}>
+-                      {item.percentage > 0 ? "+" : ""}{item.percentage}%
+-                    </p>
+-                  </div>
+-                </div>
+-              ))}
+-            </CardContent>
+-          </Card>
+-
+-          {/* Quick Actions */}
+-          <Card>
+-            <CardHeader>
+-              <CardTitle className="text-base">Quick Actions</CardTitle>
+-            </CardHeader>
+-            <CardContent className="space-y-3">
+-              <Button className="w-full bg-gradient-primary">
+-                <TrendingUp className="h-4 w-4 mr-2" />
+-                View All Signals
+-              </Button>
+-              <Button variant="outline" className="w-full">
+-                <Target className="h-4 w-4 mr-2" />
+-                Portfolio Analysis
+-              </Button>
+-              <Button variant="outline" className="w-full">
+-                <Activity className="h-4 w-4 mr-2" />
+-                Market Overview
+-              </Button>
+-            </CardContent>
+-          </Card>
+-        </div>
+-      </div>
++    <div className="container mx-auto p-4">
++      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
++      <p>This is a placeholder for the main dashboard content.</p>
+     </div>
+   );
+-}
++};
++
++export default Dashboard;
+diff --git a/src/pages/Futures.tsx b/src/pages/Futures.tsx
+index 864144e6..ed15c96c 100644
+--- a/src/pages/Futures.tsx
++++ b/src/pages/Futures.tsx
+@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
+ import { SignalCard, TradingSignal } from "@/components/trading/SignalCard";
+ import io from "socket.io-client";
+ 
+-const socket = io("http://localhost:5000");
++const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
++const socket = io(VITE_BACKEND_URL);
+ 
+ const Futures = () => {
+   const [signals, setSignals] = useState<TradingSignal[]>([]);
+diff --git a/src/pages/HelpCenter.tsx b/src/pages/HelpCenter.tsx
+index 0e211027..e42aeb5b 100644
+--- a/src/pages/HelpCenter.tsx
++++ b/src/pages/HelpCenter.tsx
+@@ -1,10 +1,12 @@
+ import React from "react";
+ 
+-const HelpCenter: React.FC = () => (
+-  <div style={{ padding: 40, textAlign: "center" }}>
+-    <h2>Help Center</h2>
+-    <p>Find answers to common questions here.</p>
+-  </div>
+-);
++const HelpCenter = () => {
++  return (
++    <div className="container mx-auto p-4">
++      <h1 className="text-2xl font-bold mb-4">Help Center</h1>
++      <p>This is a placeholder for the help center and support page.</p>
++    </div>
++  );
++};
+ 
+ export default HelpCenter; 
+\ No newline at end of file
+diff --git a/src/pages/Home.tsx b/src/pages/Home.tsx
+index a8104d2b..07ab47c2 100644
+--- a/src/pages/Home.tsx
++++ b/src/pages/Home.tsx
+@@ -1,9 +1,3 @@
+-import { Button } from "@/components/ui/button";
+-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+-import { Badge } from "@/components/ui/badge";
+-import { BarChart3, TrendingUp, Target, Zap, Shield, Users } from "lucide-react";
+-import { Link } from "react-router-dom";
+-
+ const Home = () => {
+   return (
+     <div className="container mx-auto p-4">
+diff --git a/src/pages/Login.tsx b/src/pages/Login.tsx
+index 84b3fca3..28987189 100644
+--- a/src/pages/Login.tsx
++++ b/src/pages/Login.tsx
+@@ -6,95 +6,13 @@ import { Label } from '@/components/ui/label';
+ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+ import { Link, useNavigate } from 'react-router-dom';
+ 
+-const LoginPage: React.FC = () => {
+-  const [username, setUsername] = useState('');
+-  const [password, setPassword] = useState('');
+-  const [error, setError] = useState('');
+-  const [success, setSuccess] = useState('');
+-  const navigate = useNavigate();
+-
+-  const handleLogin = async (e: React.FormEvent) => {
+-    e.preventDefault();
+-    setError('');
+-    setSuccess('');
+-
+-    try {
+-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/login`, {
+-        method: 'POST',
+-        headers: {
+-          'Content-Type': 'application/json',
+-        },
+-        body: JSON.stringify({ username, password }),
+-      });
+-
+-      const data = await response.json();
+-
+-      if (response.ok) {
+-        setSuccess('Login successful! Redirecting...');
+-        localStorage.setItem('token', data.token);
+-        setTimeout(() => navigate('/dashboard'), 1500);
+-      } else {
+-        setError(data.error || 'Login failed. Please try again.');
+-      }
+-    } catch (err) {
+-      setError('A network error occurred. Please try again.');
+-    }
+-  };
+-
++const Login = () => {
+   return (
+-    <div className="flex items-center justify-center min-h-screen bg-background">
+-      <Card className="w-full max-w-md">
+-        <CardHeader>
+-          <CardTitle>Login</CardTitle>
+-        </CardHeader>
+-        <CardContent>
+-          <form onSubmit={handleLogin} className="space-y-4">
+-            {error && (
+-              <Alert variant="destructive">
+-                <AlertTitle>Error</AlertTitle>
+-                <AlertDescription>{error}</AlertDescription>
+-              </Alert>
+-            )}
+-            {success && (
+-              <Alert>
+-                <AlertTitle>Success</AlertTitle>
+-                <AlertDescription>{success}</AlertDescription>
+-              </Alert>
+-            )}
+-            <div className="space-y-2">
+-              <Label htmlFor="username">Username</Label>
+-              <Input
+-                id="username"
+-                type="text"
+-                value={username}
+-                onChange={(e) => setUsername(e.target.value)}
+-                required
+-              />
+-            </div>
+-            <div className="space-y-2">
+-              <Label htmlFor="password">Password</Label>
+-              <Input
+-                id="password"
+-                type="password"
+-                value={password}
+-                onChange={(e) => setPassword(e.target.value)}
+-                required
+-              />
+-            </div>
+-            <Button type="submit" className="w-full">
+-              Login
+-            </Button>
+-          </form>
+-          <div className="mt-4 text-center text-sm">
+-            Don't have an account?{' '}
+-            <Link to="/register" className="underline">
+-              Sign up
+-            </Link>
+-          </div>
+-        </CardContent>
+-      </Card>
++    <div className="container mx-auto p-4">
++      <h1 className="text-2xl font-bold mb-4">Login</h1>
++      <p>This is a placeholder for the login form.</p>
+     </div>
+   );
+ };
+ 
+-export default LoginPage;
++export default Login;
+diff --git a/src/pages/Margin.tsx b/src/pages/Margin.tsx
+index c38958c4..c23063ae 100644
+--- a/src/pages/Margin.tsx
++++ b/src/pages/Margin.tsx
+@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
+ import { SignalCard, TradingSignal } from "@/components/trading/SignalCard";
+ import io from "socket.io-client";
+ 
+-const socket = io("http://localhost:5000");
++const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
++const socket = io(VITE_BACKEND_URL);
+ 
+ const Margin = () => {
+   const [signals, setSignals] = useState<TradingSignal[]>([]);
+diff --git a/src/pages/News.tsx b/src/pages/News.tsx
+index 5a47045d..6b4a31ad 100644
+--- a/src/pages/News.tsx
++++ b/src/pages/News.tsx
+@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
+ import io from 'socket.io-client';
+ import { NewsCard, NewsArticle } from '@/components/NewsCard';
+ 
+-const socket = io('http://localhost:5000');
++const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
++const socket = io(VITE_BACKEND_URL);
+ 
+ const News = () => {
+   const [articles, setArticles] = useState<NewsArticle[]>([]);
+diff --git a/src/pages/OptionsSignals.tsx b/src/pages/OptionsSignals.tsx
+index 5b9f500d..bf503804 100644
+--- a/src/pages/OptionsSignals.tsx
++++ b/src/pages/OptionsSignals.tsx
+@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
+ import { SignalCard, TradingSignal } from "@/components/trading/SignalCard";
+ import io from "socket.io-client";
+ 
+-const socket = io("http://localhost:5000");
++const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
++const socket = io(VITE_BACKEND_URL);
+ 
+ const OptionsSignals = () => {
+   const [signals, setSignals] = useState<TradingSignal[]>([]);
+diff --git a/src/pages/Pricing.tsx b/src/pages/Pricing.tsx
+index c1959ccd..71c4438b 100644
+--- a/src/pages/Pricing.tsx
++++ b/src/pages/Pricing.tsx
+@@ -42,7 +42,7 @@ const plans = [
+   }
+ ];
+ 
+-const Pricing: React.FC = () => {
++const Pricing = () => {
+   const navigate = useNavigate();
+ 
+   const handlePlanSelection = (planName: string) => {
+@@ -51,77 +51,9 @@ const Pricing: React.FC = () => {
+   };
+ 
+   return (
+-    <div style={{ position: 'relative', minHeight: '100vh', width: '100%' }}>
+-      <div style={{ position: 'relative', zIndex: 1, fontFamily: 'Inter, Poppins, Satoshi, Arial, sans-serif', color: '#f5f6fa' }}>
+-        <div className="max-w-5xl mx-auto py-16 px-4">
+-          <h1 className="text-3xl md:text-4xl font-bold mb-6 text-primary">Choose Your Plan</h1>
+-          <p className="mb-8 text-muted-foreground text-lg">CryptoBot Pro offers multiple subscription plans to fit your needs. Whether you're just starting out or need advanced features, we have the right plan for you.</p>
+-          <div className="grid md:grid-cols-3 gap-8 mb-12">
+-            {plans.map((plan, idx) => (
+-              <div key={plan.name} className="bg-card/60 rounded-xl shadow-md border border-border/40 p-8 flex flex-col items-center">
+-                {plan.name === "Bronze" && <Star className="icon w-8 h-8 text-primary mb-2" />}
+-                {plan.name === "Premium" && <Crown className="icon w-8 h-8 text-accent mb-2" />}
+-                {plan.name === "Diamond" && <Zap className="icon w-8 h-8 text-success mb-2" />}
+-                <h2 className="text-2xl font-bold mb-2 text-primary">{plan.name}</h2>
+-                <div className="text-3xl font-extrabold mb-2">{plan.price}</div>
+-                <p className="mb-4 text-muted-foreground text-sm text-center">{plan.description}</p>
+-                <ul className="mb-6 text-sm text-muted-foreground list-disc pl-5 text-left">
+-                  {plan.features.map((f, i) => <li key={i}>{f}</li>)}
+-                </ul>
+-                <Button
+-                  variant={plan.name === "Premium" ? "premium" : "outline"}
+-                  size="lg"
+-                  className="w-full"
+-                  onClick={() => handlePlanSelection(plan.name)}
+-                >
+-                  {plan.cta}
+-                </Button>
+-              </div>
+-            ))}
+-          </div>
+-          <div className="text-center mt-8">
+-            <p className="mb-4 text-muted-foreground">Select your plan and subscribe using USDT via TRC20, BEP20, or ERC20. No hidden fees, easy payments, and quick upgrades/downgrades.</p>
+-            <Button asChild size="lg" variant="premium" className="mr-4" onClick={() => handlePlanSelection('Basic')}>
+-              <Link to="/register">Start Free Trial</Link>
+-            </Button>
+-            <Button asChild size="lg" variant="outline" onClick={() => handlePlanSelection('Basic')}>
+-              <Link to="/register">Get Started</Link>
+-            </Button>
+-            <Button asChild size="lg" variant="premium" className="ml-4" onClick={() => handlePlanSelection('Enterprise')}>
+-              <Link to="/register">Contact Sales</Link>
+-            </Button>
+-          </div>
+-          <section className="mt-12">
+-            <h2 className="text-2xl font-bold mb-4 text-primary">Frequently Asked Questions</h2>
+-            <Accordion type="single" collapsible className="w-full max-w-2xl mx-auto">
+-              <AccordionItem value="q1">
+-                <AccordionTrigger>Is there a free trial?</AccordionTrigger>
+-                <AccordionContent>
+-                  Yes! You can start with a free trial before choosing a paid plan. No credit card required to start.
+-                </AccordionContent>
+-              </AccordionItem>
+-              <AccordionItem value="q2">
+-                <AccordionTrigger>How do I pay for my subscription?</AccordionTrigger>
+-                <AccordionContent>
+-                  All payments are made securely using USDT (TRC20, BEP20, or ERC20). You can manage your payment method in your account settings.
+-                </AccordionContent>
+-              </AccordionItem>
+-              <AccordionItem value="q3">
+-                <AccordionTrigger>Can I upgrade or downgrade my plan?</AccordionTrigger>
+-                <AccordionContent>
+-                  Yes, you can change your plan at any time from your dashboard. Upgrades and downgrades are instant.
+-                </AccordionContent>
+-              </AccordionItem>
+-              <AccordionItem value="q4">
+-                <AccordionTrigger>What happens if my payment fails?</AccordionTrigger>
+-                <AccordionContent>
+-                  If a payment fails, you will be notified and given a grace period to update your payment method before your subscription is paused.
+-                </AccordionContent>
+-              </AccordionItem>
+-            </Accordion>
+-          </section>
+-        </div>
+-      </div>
++    <div className="container mx-auto p-4">
++      <h1 className="text-2xl font-bold mb-4">Pricing</h1>
++      <p>This is a placeholder for the pricing plans.</p>
+     </div>
+   );
+ };
+diff --git a/src/pages/Profile.tsx b/src/pages/Profile.tsx
+index b097c20a..2ed04fb7 100644
+--- a/src/pages/Profile.tsx
++++ b/src/pages/Profile.tsx
+@@ -43,7 +43,7 @@ export default function Profile() {
+     email: "alex@example.com",
+     plan: "Premium",
+     joinDate: "March 2024",
+-    avatar: "",
++    avatar: "/placeholder.svg", // Use local placeholder
+     balance: "$11,200.50",
+     totalTrades: 1247,
+     winRate: "82%",
+@@ -176,7 +176,7 @@ export default function Profile() {
+               <div className="flex items-center gap-6">
+                 <Avatar className="w-20 h-20 border-2 border-primary/20">
+                   <AvatarImage src={userInfo.avatar} alt={userInfo.name} />
+-                  <AvatarFallback className="text-xl bg-gradient-primary text-primary-foreground">
++                  <AvatarFallback>
+                     {userInfo.name.split(' ').map(n => n[0]).join('')}
+                   </AvatarFallback>
+                 </Avatar>
+@@ -291,13 +291,14 @@ export default function Profile() {
+                     <div className="space-y-1">
+                       <div className="flex items-center gap-2">
+                         <Smartphone className="icon w-4 h-4 text-primary" />
+-                        <Label>Two-Factor Authentication</Label>
++                        <Label htmlFor="twoFactor">Two-Factor Authentication</Label>
+                       </div>
+                       <p className="text-sm text-muted-foreground">
+                         Add an extra layer of security to your account
+                       </p>
+                     </div>
+                     <Switch 
++                      id="twoFactor"
+                       checked={twoFactorEnabled} 
+                       onCheckedChange={setTwoFactorEnabled}
+                       className="data-[state=checked]:bg-primary"
+@@ -332,12 +333,13 @@ export default function Profile() {
+                 <CardContent className="space-y-6">
+                   <div className="flex items-center justify-between">
+                     <div className="space-y-1">
+-                      <Label>Email Notifications</Label>
++                      <Label htmlFor="emailNotifications">Email Notifications</Label>
+                       <p className="text-sm text-muted-foreground">
+                         Receive account updates and important information via email
+                       </p>
+                     </div>
+                     <Switch 
++                      id="emailNotifications"
+                       checked={emailNotifications} 
+                       onCheckedChange={setEmailNotifications}
+                       className="data-[state=checked]:bg-primary"
+@@ -348,12 +350,13 @@ export default function Profile() {
+                   
+                   <div className="flex items-center justify-between">
+                     <div className="space-y-1">
+-                      <Label>Trading Alerts</Label>
++                      <Label htmlFor="tradingAlerts">Trading Alerts</Label>
+                       <p className="text-sm text-muted-foreground">
+                         Get notified about trade executions and bot activities
+                       </p>
+                     </div>
+                     <Switch 
++                      id="tradingAlerts"
+                       checked={tradingAlerts} 
+                       onCheckedChange={setTradingAlerts}
+                       className="data-[state=checked]:bg-primary"
+@@ -364,12 +367,13 @@ export default function Profile() {
+                   
+                   <div className="flex items-center justify-between">
+                     <div className="space-y-1">
+-                      <Label>Price Alerts</Label>
++                      <Label htmlFor="priceAlerts">Price Alerts</Label>
+                       <p className="text-sm text-muted-foreground">
+                         Receive notifications when price targets are reached
+                       </p>
+                     </div>
+                     <Switch 
++                      id="priceAlerts"
+                       checked={priceAlerts} 
+                       onCheckedChange={setPriceAlerts}
+                       className="data-[state=checked]:bg-primary"
+diff --git a/src/pages/Register.tsx b/src/pages/Register.tsx
+index a605bc18..bb189e9c 100644
+--- a/src/pages/Register.tsx
++++ b/src/pages/Register.tsx
+@@ -8,126 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
+ import { ArrowLeft, User, Mail, Lock, CreditCard } from "lucide-react";
+ import { useToast } from "@/hooks/use-toast";
+ 
+-const Register: React.FC = () => {
+-  const location = useLocation();
+-  const navigate = useNavigate();
+-  const { toast } = useToast();
+-  const selectedPlan = location.state?.selectedPlan || 'Basic';
+-  
+-  const [formData, setFormData] = useState({
+-    email: '',
+-    password: '',
+-    confirmPassword: '',
+-    plan: selectedPlan
+-  });
+-
+-  const handleSubmit = (e: React.FormEvent) => {
+-    e.preventDefault();
+-    if (formData.password !== formData.confirmPassword) {
+-      toast({ title: 'Error', description: 'Passwords do not match.', variant: 'destructive' });
+-      return;
+-    }
+-    
+-    toast({ title: 'Registration Successful', description: `Account created with ${selectedPlan} plan.` });
+-    navigate('/dashboard');
+-  };
+-
++const Register = () => {
+   return (
+-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted flex items-center justify-center p-4">
+-      <Card className="w-full max-w-md">
+-        <CardHeader className="text-center">
+-          <Button 
+-            variant="ghost" 
+-            size="sm" 
+-            onClick={() => navigate(-1)}
+-            className="absolute left-4 top-4"
+-          >
+-            <ArrowLeft className="w-4 h-4 mr-2" />
+-            Back
+-          </Button>
+-          <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
+-          <p className="text-muted-foreground">Join our trading platform</p>
+-        </CardHeader>
+-        <CardContent>
+-          <form onSubmit={handleSubmit} className="space-y-4">
+-            <div>
+-              <Label htmlFor="email">Email</Label>
+-              <div className="relative">
+-                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+-                <Input
+-                  id="email"
+-                  type="email"
+-                  placeholder="Enter your email"
+-                  className="pl-10"
+-                  value={formData.email}
+-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+-                  required
+-                />
+-              </div>
+-            </div>
+-            
+-            <div>
+-              <Label htmlFor="password">Password</Label>
+-              <div className="relative">
+-                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+-                <Input
+-                  id="password"
+-                  type="password"
+-                  placeholder="Create a password"
+-                  className="pl-10"
+-                  value={formData.password}
+-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+-                  required
+-                />
+-              </div>
+-            </div>
+-            
+-            <div>
+-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+-              <div className="relative">
+-                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+-                <Input
+-                  id="confirmPassword"
+-                  type="password"
+-                  placeholder="Confirm your password"
+-                  className="pl-10"
+-                  value={formData.confirmPassword}
+-                  onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+-                  required
+-                />
+-              </div>
+-            </div>
+-            
+-            <div>
+-              <Label htmlFor="plan">Selected Plan</Label>
+-              <Select value={formData.plan} onValueChange={(value) => setFormData({...formData, plan: value})}>
+-                <SelectTrigger className="bg-[#181a20] text-white border border-[#2cb67d]">
+-                  <SelectValue />
+-                </SelectTrigger>
+-                <SelectContent className="bg-[#181a20] text-white border border-[#2cb67d]">
+-                  <SelectItem value="Basic" className="hover:bg-[#222531]">Basic Plan</SelectItem>
+-                  <SelectItem value="Pro" className="hover:bg-[#222531]">Pro Plan</SelectItem>
+-                  <SelectItem value="Enterprise" className="hover:bg-[#222531]">Enterprise Plan</SelectItem>
+-                </SelectContent>
+-              </Select>
+-            </div>
+-            
+-            <Button type="submit" className="w-full" variant="premium">
+-              <CreditCard className="w-4 h-4 mr-2" />
+-              Create Account
+-            </Button>
+-          </form>
+-          
+-          <div className="mt-4 text-center">
+-            <p className="text-sm text-muted-foreground">
+-              Already have an account?{' '}
+-              <Button variant="link" className="p-0 h-auto" onClick={() => navigate('/login')}>
+-                Sign in
+-              </Button>
+-            </p>
+-          </div>
+-        </CardContent>
+-      </Card>
++    <div className="container mx-auto p-4">
++      <h1 className="text-2xl font-bold mb-4">Register</h1>
++      <p>This is a placeholder for the registration form.</p>
+     </div>
+   );
+ };
+diff --git a/src/pages/Sentiment.tsx b/src/pages/Sentiment.tsx
+index 8c8a3f63..eeee39da 100644
+--- a/src/pages/Sentiment.tsx
++++ b/src/pages/Sentiment.tsx
+@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
+ import io from 'socket.io-client';
+ import { SentimentCard, SentimentData } from '@/components/SentimentCard';
+ 
+-const socket = io('http://localhost:5000');
++const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
++const socket = io(VITE_BACKEND_URL);
+ 
+ const Sentiment = () => {
+   const [sentiment, setSentiment] = useState<SentimentData[]>([]);
+diff --git a/src/pages/Spot.tsx b/src/pages/Spot.tsx
+index 6e8e47ce..3d03115d 100644
+--- a/src/pages/Spot.tsx
++++ b/src/pages/Spot.tsx
+@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
+ import { SignalCard, TradingSignal } from "@/components/trading/SignalCard";
+ import io from "socket.io-client";
+ 
+-const socket = io("http://localhost:5000");
++const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
++const socket = io(VITE_BACKEND_URL);
+ 
+ const Spot = () => {
+   const [signals, setSignals] = useState<TradingSignal[]>([]);
