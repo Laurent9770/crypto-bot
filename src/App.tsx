@@ -14,6 +14,8 @@ import Pricing from './pages/Pricing';
 import APIAccess from './pages/APIAccess';
 import HelpCenter from './pages/HelpCenter';
 import Profile from './pages/Profile';
+import Login from './pages/Login';
+import Register from './pages/Register';
 import Header from './components/Header';
 import { Footer } from './components/Footer';
 
@@ -40,6 +42,8 @@ function App() {
               <Route path="/api-access" element={<APIAccess />} />
               <Route path="/help-center" element={<HelpCenter />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
             </Routes>
           </main>
           <Footer />
