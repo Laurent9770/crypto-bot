@@ -6,7 +6,6 @@ import time
 import random
 from threading import Thread, Lock
 from flask import Flask, jsonify, request
-from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 from pymongo import MongoClient
 from flask_bcrypt import Bcrypt
@@ -22,7 +21,6 @@ DB_NAME = os.environ.get('MONGO_DB', 'crypto_bot')
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'a_very_secret_key_that_should_be_in_env')
 bcrypt = Bcrypt(app)
-CORS(app, origins="*")
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 client = MongoClient(MONGO_URI)
