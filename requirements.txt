@@ -1,0 +1,6 @@
+flask
+flask-socketio
+eventlet
+pymongo
+flask-cors
+gunicorn
