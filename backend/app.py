@@ -26,6 +26,11 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 client = MongoClient(MONGO_URI)
 db = client[DB_NAME]
 
+@app.route('/')
+def index():
+    """A simple health check endpoint."""
+    return jsonify({"status": "ok", "message": "Backend is running."})
+
 thread_lock = Lock()
 
 # --- Placeholder functions for real data integration ---
