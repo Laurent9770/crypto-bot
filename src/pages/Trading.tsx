@@ -11,7 +11,6 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { TrendingUp, TrendingDown, BarChart3, Zap, Bot, Target, Clock, DollarSign } from "lucide-react";
 import { SymbolSelector } from "@/components/SymbolSelector";
-import tradingBg from '@/assets/backgrounds/trading.jpeg';
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import CryptoPrices from '@/components/CryptoPrices';
@@ -71,16 +70,6 @@ export default function Trading() {
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh', width: '100%' }}>
-      <div
-        style={{
-          backgroundImage: `url(${tradingBg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          position: 'absolute',
-          inset: 0,
-          zIndex: 0,
-        }}
-      />
       <div style={{ position: 'relative', zIndex: 1, fontFamily: 'Inter, Poppins, Satoshi, Arial, sans-serif', color: '#f5f6fa' }}>
         <div className="min-h-screen bg-background p-6">
           <div className="max-w-[1800px] mx-auto space-y-6">
