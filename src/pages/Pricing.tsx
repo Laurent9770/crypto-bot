@@ -4,7 +4,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Star, Crown, Zap } from "lucide-react";
 import pricingBg from '@/assets/backgrounds/pricing.jpg';
-import tradingBg from '@/assets/backgrounds/trading.jpeg';
 
 const plans = [
   {
@@ -53,16 +52,6 @@ const Pricing: React.FC = () => {
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh', width: '100%' }}>
-      <div
-        style={{
-          backgroundImage: `url(${tradingBg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          position: 'absolute',
-          inset: 0,
-          zIndex: 0,
-        }}
-      />
       <div style={{ position: 'relative', zIndex: 1, fontFamily: 'Inter, Poppins, Satoshi, Arial, sans-serif', color: '#f5f6fa' }}>
         <div className="max-w-5xl mx-auto py-16 px-4">
           <h1 className="text-3xl md:text-4xl font-bold mb-6 text-primary">Choose Your Plan</h1>
