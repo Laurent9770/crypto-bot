@@ -1,42 +1,75 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+body {
+  background: #0a0f1c;
+  color: #f5f6fa;
+  font-family: 'Inter', 'Poppins', 'Satoshi', Arial, sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+::-webkit-scrollbar {
+  width: 8px;
+  background: #181a20;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #7f5af0 0%, #2cb67d 100%);
+  border-radius: 8px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.card, .bg-card, .rounded-xl, .rounded-lg {
+  background: linear-gradient(135deg, #181a20 60%, #7f5af0 100%);
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 32px 0 rgba(127,90,240,0.15), 0 1.5px 8px 0 #2cb67d33;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: box-shadow 0.2s;
+}
+
+.card:hover, .bg-card:hover {
+  box-shadow: 0 8px 48px 0 rgba(127,90,240,0.25), 0 2px 12px 0 #2cb67d55;
+}
+
+.pill, .rounded-full, .pill-shaped {
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #7f5af0 0%, #2cb67d 100%);
+  color: #fff;
+  padding: 0.5rem 1.5rem;
+  box-shadow: 0 2px 8px 0 #2cb67d33;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+input, select, textarea, button {
+  border-radius: 1rem;
+  background: #181a20;
+  color: #f5f6fa;
+  border: none;
+  box-shadow: 0 1px 4px 0 #7f5af033;
+  font-family: inherit;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Poppins', 'Inter', 'Satoshi', Arial, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.icon, .line-icon {
+  stroke: #7f5af0;
+  fill: none;
+  stroke-width: 2;
+}
+
+.chart-glow {
+  filter: drop-shadow(0 0 12px #7f5af0cc) drop-shadow(0 0 24px #2cb67dcc);
+}
+
+@media (max-width: 600px) {
+  .card, .bg-card {
+    padding: 1rem;
+    border-radius: 1rem;
   }
-  to {
-    transform: rotate(360deg);
+  .pill, .rounded-full, .pill-shaped {
+    padding: 0.4rem 1rem;
   }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }

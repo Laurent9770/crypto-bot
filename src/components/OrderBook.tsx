@@ -1,51 +1,79 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import io, { Socket } from "socket.io-client";
+import { create } from "zustand";
 
-const OrderBook: React.FC = () => {
-  const [bids, setBids] = useState([]);
-  const [asks, setAsks] = useState([]);
-  const [loading, setLoading] = useState(true);
+interface OrderBookState {
+  bids: [number, number][];
+  asks: [number, number][];
+  setOrderBook: (bids: [number, number][], asks: [number, number][]) => void;
+}
 
+const useOrderBookStore = create<OrderBookState>((set) => ({
+  bids: [],
+  asks: [],
+  setOrderBook: (bids, asks) => set({ bids, asks }),
+}));
+
+function useOrderBook(symbol: string) {
+  const setOrderBook = useOrderBookStore((s) => s.setOrderBook);
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/order_book?symbol=BTCUSDT`)
-      .then((res) => res.json())
-      .then((data) => {
-        setBids(data.bids || []);
-        setAsks(data.asks || []);
-        setLoading(false);
-      });
-  }, []);
+    const socket: Socket = io("/", { transports: ["websocket"] });
+    socket.emit("subscribe_order_book", { symbol });
+    socket.on("order_book_update", (data) => {
+      if (data.symbol === symbol) {
+        setOrderBook(data.bids, data.asks);
+      }
+    });
+    return () => {
+      socket.emit("unsubscribe_order_book", { symbol });
+      socket.disconnect();
+    };
+  }, [symbol, setOrderBook]);
+  const bids = useOrderBookStore((s) => s.bids);
+  const asks = useOrderBookStore((s) => s.asks);
+  return { bids, asks };
+}
+
+interface OrderBookProps {
+  symbol: string;
+}
+
+const OrderBook: React.FC<OrderBookProps> = ({ symbol }) => {
+  const { bids, asks } = useOrderBook(symbol);
 
   return (
-    <div className="bg-card/60 rounded-xl shadow-md border border-border/40 p-6 my-8">
-      <h2 className="text-lg font-bold mb-4 text-primary">Order Book (BTC/USDT)</h2>
-      {loading ? (
-        <div>Loading order book...</div>
-      ) : (
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <div className="font-semibold mb-2">Bids</div>
-            <table className="w-full text-xs">
-              <thead><tr><th>Price</th><th>Amount</th></tr></thead>
-              <tbody>
-                {bids.map((bid, i) => (
-                  <tr key={i} className="text-success"><td>{bid[0]}</td><td>{bid[1]}</td></tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div>
-            <div className="font-semibold mb-2">Asks</div>
-            <table className="w-full text-xs">
-              <thead><tr><th>Price</th><th>Amount</th></tr></thead>
-              <tbody>
-                {asks.map((ask, i) => (
-                  <tr key={i} className="text-destructive"><td>{ask[0]}</td><td>{ask[1]}</td></tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+    <div className="bg-card/80 rounded-xl shadow-lg border-2 border-primary/40 chart-glow p-6 my-8">
+      <h2 className="text-lg font-bold mb-4 text-primary">Order Book ({symbol})</h2>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <div className="font-semibold mb-2">Bids</div>
+          <table className="w-full text-xs">
+            <thead><tr><th>Price</th><th>Amount</th></tr></thead>
+            <tbody>
+              {bids.slice(0, 10).map((bid, i) => (
+                <tr key={i}>
+                  <td><span className="rounded-full px-2 py-1 bg-success/20 text-success font-mono pill-shaped">{bid[0]}</span></td>
+                  <td className="font-mono">{bid[1]}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      )}
+        <div>
+          <div className="font-semibold mb-2">Asks</div>
+          <table className="w-full text-xs">
+            <thead><tr><th>Price</th><th>Amount</th></tr></thead>
+            <tbody>
+              {asks.slice(0, 10).map((ask, i) => (
+                <tr key={i}>
+                  <td><span className="rounded-full px-2 py-1 bg-destructive/20 text-destructive font-mono pill-shaped">{ask[0]}</span></td>
+                  <td className="font-mono">{ask[1]}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };

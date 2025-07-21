@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: crypto-bot-backend
+    env: python
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: gunicorn --worker-class eventlet -w 1 backend.app:app
+    envVars:
+      - key: MONGO_URI
+        sync: false
+      - key: MONGO_DB
+        sync: false
+    plan: free 

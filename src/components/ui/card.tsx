@@ -8,4 +8,3 @@ export const CardHeader = ({ children }) => <div style={{ marginBottom: 8 }}>{ch
 export const CardTitle = ({ children }) => <h3 style={{ fontWeight: 'bold', color: '#F0B90B' }}>{children}</h3>;
 export const CardContent = ({ children }) => <div>{children}</div>;
 export const CardDescription = ({ children }) => <div style={{ color: '#aaa', fontSize: '0.95em', margin: '8px 0' }}>{children}</div>;
-export { Card, CardHeader, CardTitle, CardDescription, CardContent };

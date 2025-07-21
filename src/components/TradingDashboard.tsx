@@ -48,7 +48,7 @@ const SymbolDashboardCard = ({ symbol, onRemove, onSimTrade }) => {
       </Button>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <BarChart3 className="w-5 h-5 text-primary" />
+          <BarChart3 className="icon w-5 h-5 text-primary" />
           {symbol}
         </CardTitle>
       </CardHeader>
@@ -145,10 +145,12 @@ const TradeSimModal = ({ open, onClose, symbol, onSimulated }) => {
         </DialogHeader>
         <div className="space-y-4">
           <Select value={side} onValueChange={setSide}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="buy">Buy</SelectItem>
-              <SelectItem value="sell">Sell</SelectItem>
+            <SelectTrigger className="bg-[#181a20] text-white border border-[#2cb67d]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-[#181a20] text-white border border-[#2cb67d]">
+              <SelectItem value="buy" className="hover:bg-[#222531]">Buy</SelectItem>
+              <SelectItem value="sell" className="hover:bg-[#222531]">Sell</SelectItem>
             </SelectContent>
           </Select>
           <Input value={amount} onChange={e => setAmount(e.target.value)} placeholder="Amount" type="number" />
@@ -275,7 +277,7 @@ const TradingDashboard = () => {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="w-8 h-8 bg-gradient-to-r from-primary to-primary/80 rounded-lg flex items-center justify-center">
-              <BarChart3 className="w-5 h-5 text-primary-foreground" />
+              <BarChart3 className="icon w-5 h-5 text-primary-foreground" />
             </div>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
               SignalFlow
@@ -283,7 +285,7 @@ const TradingDashboard = () => {
           </div>
           <div className="flex items-center space-x-4">
             <Button variant="ghost" size="icon" onClick={() => setShowWatchlist(true)}>
-              <BarChart3 className="w-5 h-5" />
+              <BarChart3 className="icon w-5 h-5" />
             </Button>
             <Button variant="outline" className="flex items-center space-x-2">
               <span>Login</span>

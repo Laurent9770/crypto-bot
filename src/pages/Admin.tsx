@@ -25,9 +25,13 @@ import {
   XCircle,
   Eye,
   Edit,
-  Trash2
+  Trash2,
+  Save
 } from "lucide-react";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, BarChart, Bar } from "recharts";
+import adminBg from '@/assets/backgrounds/admin.jpg';
+import dashboardBg from '@/assets/backgrounds/dashboard.jpeg';
+import { useToast } from "@/hooks/use-toast";
 
 const mockUsers = [
   { id: 1, name: "Alex Thompson", email: "alex@example.com", plan: "Premium", status: "Active", balance: "$11,200", joinDate: "2024-03-15" },
@@ -58,6 +62,8 @@ export default function Admin() {
   const [selectedUser, setSelectedUser] = useState<typeof mockUsers[0] | null>(null);
   const [userFilter, setUserFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const { toast } = useToast();
+  const [showSystemSettingsModal, setShowSystemSettingsModal] = useState(false);
 
   const stats = [
     {
@@ -127,414 +133,447 @@ export default function Admin() {
     }
   };
 
+  const handleSaveConfiguration = () => {
+    // Save admin configuration
+    const config = {
+      maintenanceMode: false, // Placeholder for maintenance mode
+      apiRateLimit: 1000, // Placeholder for API rate limit
+      maxConnections: 100, // Placeholder for max connections
+      timestamp: new Date().toISOString()
+    };
+    
+    localStorage.setItem('adminConfig', JSON.stringify(config));
+    toast({ title: 'Configuration Saved', description: 'Admin configuration has been saved successfully.' });
+  };
+
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-[1400px] mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
-            <p className="text-muted-foreground">Manage users, payments, and platform operations</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <Badge variant="default" className="bg-gradient-success">
-              <Shield className="w-4 h-4 mr-1" />
-              Admin Access
-            </Badge>
-            <Button variant="premium">
-              <Settings className="w-4 h-4 mr-2" />
-              System Settings
-            </Button>
-          </div>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat, index) => (
-            <Card key={index} className="bg-gradient-card border-border/50 shadow-card hover:shadow-glow transition-all duration-300">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  {stat.title}
-                </CardTitle>
-                <stat.icon className="h-4 w-4 text-primary" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-foreground">{stat.value}</div>
-                <div className="flex items-center gap-2 mt-1">
-                  <Badge 
-                    variant={stat.changeType === "positive" ? "default" : "secondary"}
-                    className={stat.changeType === "positive" ? "bg-gradient-success" : ""}
-                  >
-                    {stat.changeType === "positive" && <TrendingUp className="w-3 h-3 mr-1" />}
-                    {stat.change}
-                  </Badge>
-                  <span className="text-xs text-muted-foreground">{stat.description}</span>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="bg-gradient-card border-border/50 shadow-card">
-            <CardHeader>
-              <CardTitle className="text-foreground">Revenue Overview</CardTitle>
-              <CardDescription>Monthly revenue and user growth</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={revenueData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--chart-grid))" />
-                  <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
-                  <YAxis stroke="hsl(var(--muted-foreground))" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: "hsl(var(--popover))", 
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "var(--radius)"
-                    }} 
-                  />
-                  <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-card border-border/50 shadow-card">
-            <CardHeader>
-              <CardTitle className="text-foreground">User Growth</CardTitle>
-              <CardDescription>New users registered over time</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={revenueData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--chart-grid))" />
-                  <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
-                  <YAxis stroke="hsl(var(--muted-foreground))" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: "hsl(var(--popover))", 
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "var(--radius)"
-                    }} 
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="users" 
-                    stroke="hsl(var(--success))" 
-                    strokeWidth={3}
-                    dot={{ fill: "hsl(var(--success))", strokeWidth: 2, r: 4 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Management Tabs */}
-        <Tabs defaultValue="users" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:w-[500px]">
-            <TabsTrigger value="users">User Management</TabsTrigger>
-            <TabsTrigger value="payments">Payments</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="system">System</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="users" className="space-y-6">
-            <Card className="bg-gradient-card border-border/50 shadow-card">
-              <CardHeader>
-                <CardTitle className="text-foreground">User Management</CardTitle>
-                <CardDescription>Manage user accounts and subscriptions</CardDescription>
-                
-                {/* Filters */}
-                <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search users..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                  <Select value={userFilter} onValueChange={setUserFilter}>
-                    <SelectTrigger className="w-[180px]">
-                      <Filter className="w-4 h-4 mr-2" />
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Users</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="suspended">Suspended</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button variant="premium">
-                    <UserPlus className="w-4 h-4 mr-2" />
-                    Add User
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>User</TableHead>
-                      <TableHead>Plan</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Balance</TableHead>
-                      <TableHead>Join Date</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredUsers.map((user) => (
-                      <TableRow key={user.id}>
-                        <TableCell>
-                          <div>
-                            <p className="font-medium text-foreground">{user.name}</p>
-                            <p className="text-sm text-muted-foreground">{user.email}</p>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={user.plan === "Diamond" ? "default" : "outline"}>
-                            {user.plan}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{getStatusBadge(user.status)}</TableCell>
-                        <TableCell className="font-mono">{user.balance}</TableCell>
-                        <TableCell className="text-muted-foreground">{user.joinDate}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button variant="outline" size="sm" onClick={() => setSelectedUser(user)}>
-                                  <Eye className="w-4 h-4" />
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent>
-                                <DialogHeader>
-                                  <DialogTitle>User Details: {selectedUser?.name}</DialogTitle>
-                                  <DialogDescription>
-                                    View and manage user account information
-                                  </DialogDescription>
-                                </DialogHeader>
-                                {selectedUser && (
-                                  <div className="space-y-4">
-                                    <div className="grid grid-cols-2 gap-4">
-                                      <div>
-                                        <Label>Email</Label>
-                                        <p className="text-sm text-foreground">{selectedUser.email}</p>
-                                      </div>
-                                      <div>
-                                        <Label>Current Plan</Label>
-                                        <p className="text-sm text-foreground">{selectedUser.plan}</p>
-                                      </div>
-                                      <div>
-                                        <Label>Status</Label>
-                                        {getStatusBadge(selectedUser.status)}
-                                      </div>
-                                      <div>
-                                        <Label>Balance</Label>
-                                        <p className="text-sm text-foreground font-mono">{selectedUser.balance}</p>
-                                      </div>
-                                    </div>
-                                    <div className="flex gap-2">
-                                      <Button variant="outline" size="sm">
-                                        <Edit className="w-4 h-4 mr-2" />
-                                        Edit User
-                                      </Button>
-                                      <Button variant="outline" size="sm">
-                                        <Ban className="w-4 h-4 mr-2" />
-                                        Suspend
-                                      </Button>
-                                    </div>
-                                  </div>
-                                )}
-                              </DialogContent>
-                            </Dialog>
-                            <Button variant="outline" size="sm">
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button variant="outline" size="sm">
-                              <MoreHorizontal className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="payments" className="space-y-6">
-            <Card className="bg-gradient-card border-border/50 shadow-card">
-              <CardHeader>
-                <CardTitle className="text-foreground">Payment Management</CardTitle>
-                <CardDescription>Monitor USDT transactions and subscriptions</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Transaction ID</TableHead>
-                      <TableHead>User</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Network</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {mockTransactions.map((transaction) => (
-                      <TableRow key={transaction.id}>
-                        <TableCell className="font-mono">{transaction.id}</TableCell>
-                        <TableCell>{transaction.user}</TableCell>
-                        <TableCell className="font-mono">{transaction.amount} {transaction.currency}</TableCell>
-                        <TableCell>
-                          <Badge variant="outline">{transaction.network}</Badge>
-                        </TableCell>
-                        <TableCell>{getTransactionStatusBadge(transaction.status)}</TableCell>
-                        <TableCell className="text-muted-foreground">{transaction.date}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm">
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                            {transaction.status === "Pending" && (
-                              <>
-                                <Button variant="outline" size="sm">
-                                  <CheckCircle className="w-4 h-4" />
-                                </Button>
-                                <Button variant="outline" size="sm">
-                                  <XCircle className="w-4 h-4" />
-                                </Button>
-                              </>
-                            )}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="analytics" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Card className="bg-gradient-card border-border/50 shadow-card">
-                <CardHeader>
-                  <CardTitle className="text-foreground">Subscription Distribution</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-foreground">Bronze</span>
-                      <span className="text-foreground">45%</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-foreground">Premium</span>
-                      <span className="text-foreground">40%</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-foreground">Diamond</span>
-                      <span className="text-foreground">15%</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-card border-border/50 shadow-card">
-                <CardHeader>
-                  <CardTitle className="text-foreground">Network Usage</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-foreground">TRC20</span>
-                      <span className="text-foreground">60%</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-foreground">BEP20</span>
-                      <span className="text-foreground">25%</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-foreground">ERC20</span>
-                      <span className="text-foreground">15%</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-card border-border/50 shadow-card">
-                <CardHeader>
-                  <CardTitle className="text-foreground">System Health</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-foreground">API Response</span>
-                      <Badge className="bg-gradient-success">99.9%</Badge>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-foreground">Trading Bot</span>
-                      <Badge className="bg-gradient-success">Active</Badge>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-foreground">Database</span>
-                      <Badge className="bg-gradient-success">Healthy</Badge>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+    <div style={{ position: 'relative', minHeight: '100vh', width: '100%' }}>
+      <div
+        style={{
+          backgroundImage: `url(${dashboardBg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          position: 'absolute',
+          inset: 0,
+          zIndex: 0,
+        }}
+      />
+      <div style={{ position: 'relative', zIndex: 1, fontFamily: 'Inter, Poppins, Satoshi, Arial, sans-serif', color: '#f5f6fa' }}>
+        <div className="max-w-[1400px] mx-auto space-y-6">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
+              <p className="text-muted-foreground">Manage users, payments, and platform operations</p>
             </div>
-          </TabsContent>
+            <div className="flex items-center gap-4">
+              <Badge variant="default" className="bg-gradient-success">
+                <Shield className="icon h-4 w-4 mr-1" />
+                Admin Access
+              </Badge>
+              <Button variant="outline" size="sm" onClick={() => setShowSystemSettingsModal(true)}>
+                <Settings className="icon h-4 w-4 mr-2" />
+                System Settings
+              </Button>
+              <Dialog open={showSystemSettingsModal} onOpenChange={setShowSystemSettingsModal}>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>System Settings</DialogTitle>
+                  </DialogHeader>
+                  <div>Placeholder for system settings content.</div>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
 
-          <TabsContent value="system" className="space-y-6">
+          {/* Stats Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {stats.map((stat, index) => (
+              <Card key={index} className="bg-gradient-card border-border/50 shadow-card hover:shadow-glow transition-all duration-300">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    {stat.title}
+                  </CardTitle>
+                  <stat.icon className="icon h-4 w-4 text-primary" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-foreground">{stat.value}</div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Badge 
+                      variant={stat.changeType === "positive" ? "default" : "secondary"}
+                      className={stat.changeType === "positive" ? "bg-gradient-success" : ""}
+                    >
+                      {stat.changeType === "positive" && <TrendingUp className="icon h-3 w-3 mr-1" />}
+                      {stat.change}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">{stat.description}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Charts */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="bg-gradient-card border-border/50 shadow-card">
               <CardHeader>
-                <CardTitle className="text-foreground">System Configuration</CardTitle>
-                <CardDescription>Manage platform settings and configurations</CardDescription>
+                <CardTitle className="text-foreground">Revenue Overview</CardTitle>
+                <CardDescription>Monthly revenue and user growth</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <h4 className="font-semibold text-foreground">Trading Settings</h4>
-                    <div className="space-y-2">
-                      <Label>Maximum Leverage</Label>
-                      <Input defaultValue="100x" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Trading Fee (%)</Label>
-                      <Input defaultValue="0.1" />
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <h4 className="font-semibold text-foreground">Payment Settings</h4>
-                    <div className="space-y-2">
-                      <Label>USDT Confirmation Blocks</Label>
-                      <Input defaultValue="12" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Payment Timeout (minutes)</Label>
-                      <Input defaultValue="30" />
-                    </div>
-                  </div>
-                </div>
-
-                <Button className="bg-gradient-primary">
-                  Save Configuration
-                </Button>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={revenueData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--chart-grid))" />
+                    <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
+                    <YAxis stroke="hsl(var(--muted-foreground))" />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: "hsl(var(--popover))", 
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "var(--radius)"
+                      }} 
+                    />
+                    <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+
+            <Card className="bg-gradient-card border-border/50 shadow-card">
+              <CardHeader>
+                <CardTitle className="text-foreground">User Growth</CardTitle>
+                <CardDescription>New users registered over time</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={revenueData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--chart-grid))" />
+                    <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
+                    <YAxis stroke="hsl(var(--muted-foreground))" />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: "hsl(var(--popover))", 
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "var(--radius)"
+                      }} 
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="users" 
+                      stroke="hsl(var(--success))" 
+                      strokeWidth={3}
+                      dot={{ fill: "hsl(var(--success))", strokeWidth: 2, r: 4 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Management Tabs */}
+          <Tabs defaultValue="users" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-4 lg:w-[500px]">
+              <TabsTrigger value="users">User Management</TabsTrigger>
+              <TabsTrigger value="payments">Payments</TabsTrigger>
+              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              <TabsTrigger value="system">System</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="users" className="space-y-6">
+              <Card className="bg-gradient-card border-border/50 shadow-card">
+                <CardHeader>
+                  <CardTitle className="text-foreground">User Management</CardTitle>
+                  <CardDescription>Manage user accounts and subscriptions</CardDescription>
+                  
+                  {/* Filters */}
+                  <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search users..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                    <Select value={userFilter} onValueChange={setUserFilter}>
+                      <SelectTrigger className="w-[180px]">
+                        <Filter className="icon h-4 w-4 mr-2" />
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Users</SelectItem>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="suspended">Suspended</SelectItem>
+                        <SelectItem value="inactive">Inactive</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button variant="premium">
+                      <UserPlus className="icon h-4 w-4 mr-2" />
+                      Add User
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>User</TableHead>
+                        <TableHead>Plan</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Balance</TableHead>
+                        <TableHead>Join Date</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredUsers.map((user) => (
+                        <TableRow key={user.id}>
+                          <TableCell>
+                            <div>
+                              <p className="font-medium text-foreground">{user.name}</p>
+                              <p className="text-sm text-muted-foreground">{user.email}</p>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={user.plan === "Diamond" ? "default" : "outline"}>
+                              {user.plan}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>{getStatusBadge(user.status)}</TableCell>
+                          <TableCell className="font-mono">{user.balance}</TableCell>
+                          <TableCell className="text-muted-foreground">{user.joinDate}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button variant="outline" size="sm" onClick={() => setSelectedUser(user)}>
+                                    <Eye className="icon h-4 w-4" />
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                  <DialogHeader>
+                                    <DialogTitle>User Details: {selectedUser?.name}</DialogTitle>
+                                    <DialogDescription>
+                                      View and manage user account information
+                                    </DialogDescription>
+                                  </DialogHeader>
+                                  {selectedUser && (
+                                    <div className="space-y-4">
+                                      <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                          <Label>Email</Label>
+                                          <p className="text-sm text-foreground">{selectedUser.email}</p>
+                                        </div>
+                                        <div>
+                                          <Label>Current Plan</Label>
+                                          <p className="text-sm text-foreground">{selectedUser.plan}</p>
+                                        </div>
+                                        <div>
+                                          <Label>Status</Label>
+                                          {getStatusBadge(selectedUser.status)}
+                                        </div>
+                                        <div>
+                                          <Label>Balance</Label>
+                                          <p className="text-sm text-foreground font-mono">{selectedUser.balance}</p>
+                                        </div>
+                                      </div>
+                                      <div className="flex gap-2">
+                                        <Button variant="outline" size="sm">
+                                          <Edit className="icon h-4 w-4 mr-2" />
+                                          Edit User
+                                        </Button>
+                                        <Button variant="outline" size="sm">
+                                          <Ban className="icon h-4 w-4 mr-2" />
+                                          Suspend
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  )}
+                                </DialogContent>
+                              </Dialog>
+                              <Button variant="outline" size="sm">
+                                <Edit className="icon h-4 w-4" />
+                              </Button>
+                              <Button variant="outline" size="sm">
+                                <MoreHorizontal className="icon h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="payments" className="space-y-6">
+              <Card className="bg-gradient-card border-border/50 shadow-card">
+                <CardHeader>
+                  <CardTitle className="text-foreground">Payment Management</CardTitle>
+                  <CardDescription>Monitor USDT transactions and subscriptions</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Transaction ID</TableHead>
+                        <TableHead>User</TableHead>
+                        <TableHead>Amount</TableHead>
+                        <TableHead>Network</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {mockTransactions.map((transaction) => (
+                        <TableRow key={transaction.id}>
+                          <TableCell className="font-mono">{transaction.id}</TableCell>
+                          <TableCell>{transaction.user}</TableCell>
+                          <TableCell className="font-mono">{transaction.amount} {transaction.currency}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{transaction.network}</Badge>
+                          </TableCell>
+                          <TableCell>{getTransactionStatusBadge(transaction.status)}</TableCell>
+                          <TableCell className="text-muted-foreground">{transaction.date}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Button variant="outline" size="sm">
+                                <Eye className="icon h-4 w-4" />
+                              </Button>
+                              {transaction.status === "Pending" && (
+                                <>
+                                  <Button variant="outline" size="sm">
+                                    <CheckCircle className="icon h-4 w-4" />
+                                  </Button>
+                                  <Button variant="outline" size="sm">
+                                    <XCircle className="icon h-4 w-4" />
+                                  </Button>
+                                </>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="analytics" className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <Card className="bg-gradient-card border-border/50 shadow-card">
+                  <CardHeader>
+                    <CardTitle className="text-foreground">Subscription Distribution</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-foreground">Bronze</span>
+                        <span className="text-foreground">45%</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-foreground">Premium</span>
+                        <span className="text-foreground">40%</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-foreground">Diamond</span>
+                        <span className="text-foreground">15%</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-card border-border/50 shadow-card">
+                  <CardHeader>
+                    <CardTitle className="text-foreground">Network Usage</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-foreground">TRC20</span>
+                        <span className="text-foreground">60%</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-foreground">BEP20</span>
+                        <span className="text-foreground">25%</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-foreground">ERC20</span>
+                        <span className="text-foreground">15%</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-card border-border/50 shadow-card">
+                  <CardHeader>
+                    <CardTitle className="text-foreground">System Health</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-foreground">API Response</span>
+                        <Badge className="bg-gradient-success">99.9%</Badge>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-foreground">Trading Bot</span>
+                        <Badge className="bg-gradient-success">Active</Badge>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-foreground">Database</span>
+                        <Badge className="bg-gradient-success">Healthy</Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="system" className="space-y-6">
+              <Card className="bg-gradient-card border-border/50 shadow-card">
+                <CardHeader>
+                  <CardTitle className="text-foreground">System Configuration</CardTitle>
+                  <CardDescription>Manage platform settings and configurations</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <h4 className="font-semibold text-foreground">Trading Settings</h4>
+                      <div className="space-y-2">
+                        <Label>Maximum Leverage</Label>
+                        <Input defaultValue="100x" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Trading Fee (%)</Label>
+                        <Input defaultValue="0.1" />
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h4 className="font-semibold text-foreground">Payment Settings</h4>
+                      <div className="space-y-2">
+                        <Label>USDT Confirmation Blocks</Label>
+                        <Input defaultValue="12" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Payment Timeout (minutes)</Label>
+                        <Input defaultValue="30" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <Button className="bg-gradient-primary" onClick={handleSaveConfiguration}>
+                    Save Configuration
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </div>
   );

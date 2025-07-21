@@ -11,7 +11,7 @@ export const Footer = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center shadow-glow">
-                <TrendingUp className="w-5 h-5 text-primary-foreground" />
+                <TrendingUp className="icon w-5 h-5 text-primary-foreground" />
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
                 CryptoBot Pro
@@ -52,15 +52,15 @@ export const Footer = () => {
             <h3 className="font-semibold text-foreground">Contact</h3>
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Mail className="w-4 h-4" />
+                <Mail className="icon w-4 h-4" />
                 <span>support@cryptobotpro.com</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Phone className="w-4 h-4" />
+                <Phone className="icon w-4 h-4" />
                 <span>+1 (555) 123-4567</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <MapPin className="w-4 h-4" />
+                <MapPin className="icon w-4 h-4" />
                 <span>Global Support 24/7</span>
               </div>
             </div>

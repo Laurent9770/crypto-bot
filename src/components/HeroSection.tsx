@@ -28,7 +28,7 @@ export const HeroSection = () => {
         <div className="max-w-4xl mx-auto">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-gradient-primary px-4 py-2 rounded-full text-sm font-medium mb-8 shadow-glow">
-            <Zap className="w-4 h-4" />
+            <Zap className="icon w-4 h-4" />
             <span>Advanced AI Trading Platform</span>
           </div>
 
@@ -48,15 +48,15 @@ export const HeroSection = () => {
           {/* Feature highlights */}
           <div className="flex flex-wrap justify-center gap-6 mb-12">
             <div className="flex items-center gap-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-lg border border-border/50">
-              <TrendingUp className="w-5 h-5 text-success" />
+              <TrendingUp className="icon w-5 h-5 text-success" />
               <span className="text-sm font-medium">Spot, Margin & Futures</span>
             </div>
             <div className="flex items-center gap-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-lg border border-border/50">
-              <Shield className="w-5 h-5 text-primary" />
+              <Shield className="icon w-5 h-5 text-primary" />
               <span className="text-sm font-medium">Secure USDT Payments</span>
             </div>
             <div className="flex items-center gap-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-lg border border-border/50">
-              <Zap className="w-5 h-5 text-accent" />
+              <Zap className="icon w-5 h-5 text-accent" />
               <span className="text-sm font-medium">Real-Time Execution</span>
             </div>
           </div>
@@ -65,7 +65,7 @@ export const HeroSection = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="trading" size="lg" className="text-lg px-8 py-6">
               Start Trading Now
-              <ArrowRight className="w-5 h-5" />
+              <ArrowRight className="icon w-5 h-5" />
             </Button>
             <Button variant="glass" size="lg" className="text-lg px-8 py-6">
               View Live Demo

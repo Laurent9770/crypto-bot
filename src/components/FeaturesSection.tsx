@@ -99,7 +99,7 @@ export const FeaturesSection = () => {
               <CardContent className="p-8">
                 <div className="flex items-start gap-4">
                   <div className={`p-3 rounded-lg bg-card/50 backdrop-blur-sm border border-border/50 group-hover:scale-110 transition-transform duration-300`}>
-                    <feature.icon className={`w-6 h-6 ${feature.color}`} />
+                    <feature.icon className={`icon w-6 h-6 ${feature.color}`} />
                   </div>
                   <div className="flex-1">
                     <h3 className="text-xl font-semibold mb-3 group-hover:text-primary transition-colors duration-300">
@@ -118,7 +118,7 @@ export const FeaturesSection = () => {
         {/* Bottom CTA */}
         <div className="text-center mt-16">
           <div className="inline-flex items-center gap-2 bg-gradient-primary px-6 py-3 rounded-full text-sm font-medium shadow-glow">
-            <Zap className="w-4 h-4" />
+            <Zap className="icon w-4 h-4" />
             <span>Join thousands of successful traders today</span>
           </div>
         </div>

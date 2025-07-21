@@ -75,7 +75,7 @@ export const SubscriptionPlans = () => {
         {/* Header */}
         <div className="text-center mb-16">
           <Badge variant="outline" className="mb-4 text-sm px-3 py-1">
-            <Crown className="w-4 h-4 mr-2" />
+            <Crown className="icon w-4 h-4 mr-2" />
             Choose Your Plan
           </Badge>
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -114,7 +114,7 @@ export const SubscriptionPlans = () => {
               {plan.badge && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <Badge variant="outline" className="bg-gradient-primary text-primary-foreground border-primary/30 shadow-glow">
-                    <Star className="w-3 h-3 mr-1" />
+                    <Star className="icon w-3 h-3 mr-1" />
                     {plan.badge}
                   </Badge>
                 </div>
@@ -122,9 +122,9 @@ export const SubscriptionPlans = () => {
 
               <CardHeader className="text-center pb-8">
                 <div className="flex justify-center mb-4">
-                  {plan.name === 'Bronze' && <Zap className="w-8 h-8 text-muted-foreground" />}
-                  {plan.name === 'Premium' && <Star className="w-8 h-8 text-primary" />}
-                  {plan.name === 'Diamond' && <Crown className="w-8 h-8 text-accent" />}
+                  {plan.name === 'Bronze' && <Zap className="icon w-8 h-8 text-muted-foreground" />}
+                  {plan.name === 'Premium' && <Star className="icon w-8 h-8 text-primary" />}
+                  {plan.name === 'Diamond' && <Crown className="icon w-8 h-8 text-accent" />}
                 </div>
                 <CardTitle className="text-2xl font-bold">{plan.name}</CardTitle>
                 <CardDescription className="text-muted-foreground">{plan.description}</CardDescription>
@@ -138,7 +138,7 @@ export const SubscriptionPlans = () => {
                 <ul className="space-y-3">
                   {plan.features.map((feature, featureIndex) => (
                     <li key={featureIndex} className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-success mt-0.5 flex-shrink-0" />
+                      <Check className="icon w-5 h-5 text-success mt-0.5 flex-shrink-0" />
                       <span className="text-sm">{feature}</span>
                     </li>
                   ))}

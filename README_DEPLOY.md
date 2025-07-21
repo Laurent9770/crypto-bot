@@ -1,47 +1,30 @@
-# Deployment Instructions
+# Deployment Guide: Flask + React + MongoDB
 
-## Backend (Flask)
+## Backend (Flask) on Render
+1. Sign up at https://render.com
+2. Click "New Web Service" and connect your repo
+3. Set build command: `pip install -r backend/requirements.txt`
+4. Set start command: `gunicorn --worker-class eventlet -w 1 backend.app:app`
+5. Add environment variables from backend/.env.example
+6. Deploy and note your backend URL
 
-### Local Production Run
-1. Install dependencies:
-   ```
-   cd backend
-   ../venv/Scripts/pip install -r requirements.txt
-   ```
-2. Run with Gunicorn:
-   ```
-   gunicorn app:app
-   ```
-   (Or use `python app.py` for development)
+## Frontend (React) on Netlify
+1. Sign up at https://netlify.com
+2. Drag and drop your `dist/` folder or connect your repo
+3. Set build command: `npm run build`
+4. Set publish directory: `dist`
+5. Add environment variable VITE_BACKEND_URL with your Render backend URL
+6. Deploy and note your frontend URL
 
-### Cloud Deployment (Render/Heroku)
-- Use the `Procfile` and push your repo to Render or Heroku.
-- Set your MongoDB URI as an environment variable if using MongoDB Atlas.
+## MongoDB (Atlas)
+1. Go to https://cloud.mongodb.com
+2. Create a free cluster, database, and user
+3. Get your connection string and add to Render as MONGO_URI
 
-## Frontend (React/Vite)
+## WebSocket Connection
+- The frontend uses VITE_BACKEND_URL to connect to the backend for live updates.
+- Make sure CORS is enabled in Flask (already set in backend/app.py)
 
-### Local Production Build
-1. Build static files:
-   ```
-   npm run build
-   ```
-2. Serve with a static server:
-   ```
-   npx serve dist
-   ```
-   (Or deploy `dist/` to Vercel/Netlify)
-
-### Cloud Deployment (Vercel/Netlify)
-- Connect your repo and set build command to `npm run build`, output directory to `dist`.
-
----
-
-## Unified Local Run (Dev)
-- Run backend: `python backend/app.py`
-- Run frontend: `npm run dev`
-
----
-
-## Notes
-- Update MongoDB connection string in `backend/app.py` for cloud deployments.
-- For questions, see the main README or ask your assistant. 
+## Troubleshooting
+- If you see CORS or WebSocket errors, check your environment variables and URLs.
+- Make sure both backend and frontend are deployed and accessible. 

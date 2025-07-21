@@ -1,53 +1,37 @@
-import React, { useEffect, useState } from "react";
-
-type CryptoPrice = {
-  symbol: string;
-  exchange: string;
-  price: number;
-  volume: number;
-  timestamp: number | string;
-};
+import React from "react";
+import { useCryptoPrices } from "@/hooks/useCryptoPrices";
+import { useLivePriceUpdates } from "@/hooks/useLivePriceUpdates";
+import { usePriceStore } from "@/state/usePriceStore";
 
 const CryptoPrices: React.FC = () => {
-  const [prices, setPrices] = useState<CryptoPrice[]>([]);
-  const [loading, setLoading] = useState(true);
+  useLivePriceUpdates();
+  const { isLoading, isError } = useCryptoPrices();
+  const prices = usePriceStore((s) => s.prices);
 
-  useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/crypto_prices`)
-      .then((res) => res.json())
-      .then((data) => {
-        setPrices(data);
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) return <div>Loading...</div>;
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error loading prices.</div>;
 
   return (
     <div>
-      <h2>Live Crypto Prices</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Symbol</th>
-            <th>Exchange</th>
-            <th>Price</th>
-            <th>Volume</th>
-            <th>Timestamp</th>
-          </tr>
-        </thead>
-        <tbody>
-          {prices.map((p, idx) => (
-            <tr key={idx}>
-              <td>{p.symbol}</td>
-              <td>{p.exchange}</td>
-              <td>{p.price}</td>
-              <td>{p.volume}</td>
-              <td>{new Date(Number(p.timestamp)).toLocaleString()}</td>
+      <h2 className="text-2xl font-bold mb-4 text-primary">Live Crypto Prices</h2>
+      <div className="overflow-x-auto rounded-lg shadow-lg">
+        <table className="min-w-full bg-card/80 border border-border/30 text-foreground chart-glow">
+          <thead>
+            <tr>
+              <th className="px-4 py-2">Symbol</th>
+              <th className="px-4 py-2">Price</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {prices.map((p, idx) => (
+              <tr key={idx} className="hover:bg-muted/10 transition">
+                <td className="px-4 py-2 font-mono">{p.symbol}</td>
+                <td className="px-4 py-2 font-semibold">${p.price.toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
