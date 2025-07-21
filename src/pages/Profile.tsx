@@ -43,7 +43,7 @@ export default function Profile() {
     email: "alex@example.com",
     plan: "Premium",
     joinDate: "March 2024",
-    avatar: "/placeholder.svg", // Use local placeholder
+    avatar: "",
     balance: "$11,200.50",
     totalTrades: 1247,
     winRate: "82%",
@@ -176,7 +176,7 @@ export default function Profile() {
               <div className="flex items-center gap-6">
                 <Avatar className="w-20 h-20 border-2 border-primary/20">
                   <AvatarImage src={userInfo.avatar} alt={userInfo.name} />
-                  <AvatarFallback>
+                  <AvatarFallback className="text-xl bg-gradient-primary text-primary-foreground">
                     {userInfo.name.split(' ').map(n => n[0]).join('')}
                   </AvatarFallback>
                 </Avatar>
@@ -291,14 +291,13 @@ export default function Profile() {
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <Smartphone className="icon w-4 h-4 text-primary" />
-                        <Label htmlFor="twoFactor">Two-Factor Authentication</Label>
+                        <Label>Two-Factor Authentication</Label>
                       </div>
                       <p className="text-sm text-muted-foreground">
                         Add an extra layer of security to your account
                       </p>
                     </div>
                     <Switch 
-                      id="twoFactor"
                       checked={twoFactorEnabled} 
                       onCheckedChange={setTwoFactorEnabled}
                       className="data-[state=checked]:bg-primary"
@@ -333,13 +332,12 @@ export default function Profile() {
                 <CardContent className="space-y-6">
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                      <Label htmlFor="emailNotifications">Email Notifications</Label>
+                      <Label>Email Notifications</Label>
                       <p className="text-sm text-muted-foreground">
                         Receive account updates and important information via email
                       </p>
                     </div>
                     <Switch 
-                      id="emailNotifications"
                       checked={emailNotifications} 
                       onCheckedChange={setEmailNotifications}
                       className="data-[state=checked]:bg-primary"
@@ -350,13 +348,12 @@ export default function Profile() {
                   
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                      <Label htmlFor="tradingAlerts">Trading Alerts</Label>
+                      <Label>Trading Alerts</Label>
                       <p className="text-sm text-muted-foreground">
                         Get notified about trade executions and bot activities
                       </p>
                     </div>
                     <Switch 
-                      id="tradingAlerts"
                       checked={tradingAlerts} 
                       onCheckedChange={setTradingAlerts}
                       className="data-[state=checked]:bg-primary"
@@ -367,13 +364,12 @@ export default function Profile() {
                   
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                      <Label htmlFor="priceAlerts">Price Alerts</Label>
+                      <Label>Price Alerts</Label>
                       <p className="text-sm text-muted-foreground">
                         Receive notifications when price targets are reached
                       </p>
                     </div>
                     <Switch 
-                      id="priceAlerts"
                       checked={priceAlerts} 
                       onCheckedChange={setPriceAlerts}
                       className="data-[state=checked]:bg-primary"

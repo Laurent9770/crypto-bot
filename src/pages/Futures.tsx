@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { SignalCard, TradingSignal } from "@/components/trading/SignalCard";
 import io from "socket.io-client";
 
-const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
-const socket = io(VITE_BACKEND_URL);
+const socket = io("http://localhost:5000");
 
 const Futures = () => {
   const [signals, setSignals] = useState<TradingSignal[]>([]);

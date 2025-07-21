@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import { SentimentCard, SentimentData } from '@/components/SentimentCard';
 
-const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
-const socket = io(VITE_BACKEND_URL);
+const socket = io('http://localhost:5000');
 
 const Sentiment = () => {
   const [sentiment, setSentiment] = useState<SentimentData[]>([]);
