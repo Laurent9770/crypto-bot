@@ -1,155 +1,209 @@
-import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TrendingUp, TrendingDown, DollarSign, Bot, Target, Activity, Zap } from "lucide-react";
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, AreaChart, Area } from "recharts";
-import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
-import CryptoPrices from '@/components/CryptoPrices';
-import LiveChart from '@/components/LiveChart';
+import { Button } from "@/components/ui/button";
+import { TrendingUp, TrendingDown, DollarSign, Target, Zap, Activity, ArrowUpRight, ArrowDownRight } from "lucide-react";
+// import { SignalCard, type TradingSignal } from "@/components/trading/SignalCard";
+// import { mockSignals } from "@/lib/mockData";
 
-// Mock data
-const portfolioData = [
-  { time: "00:00", value: 10000, profit: 0 },
-  { time: "04:00", value: 10250, profit: 250 },
-  { time: "08:00", value: 10180, profit: 180 },
-  { time: "12:00", value: 10420, profit: 420 },
-  { time: "16:00", value: 10650, profit: 650 },
-  { time: "20:00", value: 10800, profit: 800 },
-  { time: "24:00", value: 11200, profit: 1200 },
+// Temporary mock data and SignalCard for demonstration
+const mockSignals = [
+  { id: 1, asset: "BTC/USDT", action: "Buy", confidence: 0.93, entry: 67000, target: 69000, stop: 66000 },
+  { id: 2, asset: "ETH/USDT", action: "Sell", confidence: 0.91, entry: 3500, target: 3200, stop: 3600 },
+  { id: 3, asset: "SOL/USDT", action: "Hold", confidence: 0.88, entry: 150, target: 170, stop: 140 },
+  { id: 4, asset: "ADA/USDT", action: "Buy", confidence: 0.90, entry: 0.45, target: 0.55, stop: 0.40 },
+  { id: 5, asset: "XRP/USDT", action: "Sell", confidence: 0.87, entry: 0.60, target: 0.50, stop: 0.65 },
+  { id: 6, asset: "BNB/USDT", action: "Buy", confidence: 0.92, entry: 320, target: 350, stop: 310 },
 ];
 
-const tradingPerformanceData = [
-  { month: "Jan", wins: 65, losses: 35 },
-  { month: "Feb", wins: 72, losses: 28 },
-  { month: "Mar", wins: 68, losses: 32 },
-  { month: "Apr", wins: 75, losses: 25 },
-  { month: "May", wins: 78, losses: 22 },
-  { month: "Jun", wins: 82, losses: 18 },
-];
+function SignalCard({ signal }: any) {
+  return (
+    <Card className="border-primary/20">
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-base font-medium">{signal.asset}</CardTitle>
+        <Badge className={signal.action === "Buy" ? "bg-success" : signal.action === "Sell" ? "bg-destructive" : "bg-muted-foreground"}>{signal.action}</Badge>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        <div className="flex items-center gap-2 text-sm">
+          <span>Confidence:</span>
+          <span className="font-bold">{(signal.confidence * 100).toFixed(0)}%</span>
+        </div>
+        <div className="flex justify-between text-xs">
+          <div>Entry: <span className="font-mono">{signal.entry}</span></div>
+          <div>Target: <span className="font-mono">{signal.target}</span></div>
+          <div>Stop: <span className="font-mono">{signal.stop}</span></div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function Dashboard() {
-  const [activeBot, setActiveBot] = useState(true);
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const [showBotsModal, setShowBotsModal] = useState(false);
-  const [showSignalsModal, setShowSignalsModal] = useState(false);
-  const [showExecuteModal, setShowExecuteModal] = useState(false);
-  const [showMonitorModal, setShowMonitorModal] = useState(false);
+  const topSignals = mockSignals.slice(0, 6);
+  
+  const stats = {
+    totalSignals: 247,
+    accuracy: 89.5,
+    profit: 12750,
+    activePositions: 8
+  };
 
-  const stats = [
-    {
-      title: "Total Balance",
-      value: "$11,200.50",
-      change: "+12.5%",
-      changeType: "positive",
-      icon: DollarSign,
-      description: "Last 24 hours"
-    },
-    {
-      title: "Today's P&L",
-      value: "+$425.30",
-      change: "+3.8%",
-      changeType: "positive",
-      icon: TrendingUp,
-      description: "Active trades"
-    },
-    {
-      title: "Win Rate",
-      value: "82%",
-      change: "+5.2%",
-      changeType: "positive",
-      icon: Target,
-      description: "This month"
-    },
-    {
-      title: "Active Signals",
-      value: "12",
-      change: "+2",
-      changeType: "default", // changed from neutral to default
-      icon: Activity,
-      description: "Currently running"
-    }
-  ];
-
-  const recentTrades = [
-    { pair: "BTC/USDT", type: "BUY", amount: "0.5 BTC", price: "$67,340", pnl: "+$234.50", status: "Closed" },
-    { pair: "ETH/USDT", type: "SELL", amount: "2.5 ETH", price: "$3,245", pnl: "+$89.25", status: "Open" },
-    { pair: "ADA/USDT", type: "BUY", amount: "1000 ADA", price: "$0.58", pnl: "-$12.30", status: "Open" },
-    { pair: "SOL/USDT", type: "BUY", amount: "10 SOL", price: "$142", pnl: "+$45.80", status: "Closed" },
+  const recentPerformance = [
+    { asset: "BTC/USDT", profit: 1250, percentage: 12.5, type: "profit" },
+    { asset: "ETH/USDT", profit: 850, percentage: 8.3, type: "profit" },
+    { asset: "SOL/USDT", profit: -320, percentage: -3.2, type: "loss" },
+    { asset: "ADA/USDT", profit: 420, percentage: 4.1, type: "profit" },
   ];
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-[1800px] mx-auto space-y-6">
-        <CryptoPrices />
-        <LiveChart symbol="BTCUSDT" />
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Trading Dashboard</h1>
-            <p className="text-muted-foreground">Monitor your portfolio and trading performance</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <Badge variant={activeBot ? "default" : "secondary"} className="bg-gradient-success cursor-pointer" onClick={() => setShowBotsModal(true)}>
-              <Bot className="icon h-4 w-4 mr-1" />
-              Bot {activeBot ? "Active" : "Inactive"}
-            </Badge>
-            <Dialog open={showBotsModal} onOpenChange={setShowBotsModal}>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Active Bots</DialogTitle>
-                </DialogHeader>
-                <div>List of active bots and their status will appear here.</div>
-              </DialogContent>
-            </Dialog>
-            <Button 
-              variant="default"  /* changed from premium to default */
-              size="sm" 
-              onClick={() => navigate('/pricing')}
-            >
-              <Zap className="icon h-4 w-4 mr-2" />
-              Upgrade Plan
+    <div className="space-y-6 animate-fade-in">
+      {/* Header */}
+      <div>
+        <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+          Trading Dashboard
+        </h1>
+        <p className="text-muted-foreground mt-2">
+          AI-powered trading signals and market intelligence
+        </p>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="bg-gradient-success/10 border-success/20">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Signals</CardTitle>
+            <Activity className="h-4 w-4 text-success" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-success">{stats.totalSignals}</div>
+            <p className="text-xs text-muted-foreground">
+              +12 from yesterday
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-primary/10 border-primary/20">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Accuracy Rate</CardTitle>
+            <Target className="h-4 w-4 text-primary" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-primary">{stats.accuracy}%</div>
+            <p className="text-xs text-muted-foreground">
+              +2.3% this week
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-warning/10 border-warning/20">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Portfolio Value</CardTitle>
+            <DollarSign className="h-4 w-4 text-warning" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-warning">${stats.profit.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground">
+              +15.2% this month
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-danger/10 border-danger/20">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Positions</CardTitle>
+            <Zap className="h-4 w-4 text-danger" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-danger">{stats.activePositions}</div>
+            <p className="text-xs text-muted-foreground">
+              3 profitable, 2 pending
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Top Signals */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold">Top Signals Today</h2>
+            <Button variant="outline" size="sm">
+              View All
             </Button>
           </div>
+          
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+            {topSignals.map((signal) => (
+              <SignalCard key={signal.id} signal={signal} />
+            ))}
+          </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat, index) => (
-            <Card key={index} className="bg-gradient-card border-border/50 shadow-card hover:shadow-glow transition-all duration-300">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  {stat.title}
-                </CardTitle>
-                <stat.icon className="icon h-4 w-4 text-primary" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-foreground">{stat.value}</div>
-                <div className="flex items-center gap-2 mt-1">
-                  <Badge 
-                    variant={stat.changeType === "positive" ? "default" : "secondary"}
-                    className={stat.changeType === "positive" ? "bg-gradient-success" : ""}
-                  >
-                    {stat.changeType === "positive" ? 
-                      <TrendingUp className="icon h-3 w-3 mr-1" /> : 
-                      <TrendingDown className="icon h-3 w-3 mr-1" />
-                    }
-                    {stat.change}
-                  </Badge>
-                  <span className="text-xs text-muted-foreground">{stat.description}</span>
+        {/* Recent Performance */}
+        <div className="space-y-6">
+          <h2 className="text-xl font-semibold">Recent Performance</h2>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Position History</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {recentPerformance.map((item, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-lg ${
+                      item.type === "profit" ? "bg-success/10" : "bg-danger/10"
+                    }`}>
+                      {item.type === "profit" ? (
+                        <ArrowUpRight className="h-4 w-4 text-success" />
+                      ) : (
+                        <ArrowDownRight className="h-4 w-4 text-danger" />
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm">{item.asset}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {item.type === "profit" ? "Closed" : "Stop Loss"}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className={`font-medium text-sm ${
+                      item.type === "profit" ? "text-success" : "text-danger"
+                    }`}>
+                      {item.profit > 0 ? "+" : ""}${item.profit}
+                    </p>
+                    <p className={`text-xs ${
+                      item.type === "profit" ? "text-success" : "text-danger"
+                    }`}>
+                      {item.percentage > 0 ? "+" : ""}{item.percentage}%
+                    </p>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* Quick Actions */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button className="w-full bg-gradient-primary">
+                <TrendingUp className="h-4 w-4 mr-2" />
+                View All Signals
+              </Button>
+              <Button variant="outline" className="w-full">
+                <Target className="h-4 w-4 mr-2" />
+                Portfolio Analysis
+              </Button>
+              <Button variant="outline" className="w-full">
+                <Activity className="h-4 w-4 mr-2" />
+                Market Overview
+              </Button>
+            </CardContent>
+          </Card>
         </div>
-
-        {/* Charts Section */}
-        {/* ...rest of your code remains unchanged */}
-
       </div>
     </div>
   );
