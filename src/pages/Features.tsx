@@ -5,7 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BarChart3, Cpu, Users, Shield, TrendingUp, TrendingDown, Target, Zap, Bot, Activity } from "lucide-react";
 import { SymbolSelector } from "@/components/SymbolSelector";
-import analyticsBg from '@/assets/backgrounds/analytics.jpeg';
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import CryptoPrices from '@/components/CryptoPrices';

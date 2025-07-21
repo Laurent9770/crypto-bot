@@ -5,7 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BarChart3, Zap, Bot } from "lucide-react";
 import { SymbolSelector } from "@/components/SymbolSelector";
-import analyticsBg from '@/assets/backgrounds/analytics.jpeg';
 import { useToast } from "@/hooks/use-toast";
 import CryptoPrices from '@/components/CryptoPrices';
 import LiveChart from '@/components/LiveChart';
@@ -64,16 +63,6 @@ export default function Margin() {
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh', width: '100%' }}>
-      <div
-        style={{
-          backgroundImage: `url(${analyticsBg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          position: 'absolute',
-          inset: 0,
-          zIndex: 0,
-        }}
-      />
       <div style={{ position: 'relative', zIndex: 1, fontFamily: 'Inter, Poppins, Satoshi, Arial, sans-serif', color: '#f5f6fa' }}>
         <div className="max-w-7xl mx-auto space-y-8">
           <CryptoPrices />

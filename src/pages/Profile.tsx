@@ -28,8 +28,6 @@ import {
   Save
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import profileBg from '@/assets/backgrounds/profile.jpg';
-import analyticsBg from '@/assets/backgrounds/analytics.jpeg';
 
 export default function Profile() {
   const [showApiKey, setShowApiKey] = useState(false);
@@ -158,16 +156,6 @@ export default function Profile() {
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh', width: '100%' }}>
-      <div
-        style={{
-          backgroundImage: `url(${analyticsBg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          position: 'absolute',
-          inset: 0,
-          zIndex: 0,
-        }}
-      />
       <div style={{ position: 'relative', zIndex: 1, fontFamily: 'Inter, Poppins, Satoshi, Arial, sans-serif', color: '#f5f6fa' }}>
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Header */}
