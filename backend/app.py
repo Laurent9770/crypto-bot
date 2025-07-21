@@ -117,6 +117,60 @@ def get_backtest_by_symbol(symbol):
         "backtest": backtest
     })
 
+@app.route('/api/ai-signals')
+def ai_signals():
+    # Mock data for demonstration
+    signals = [
+        {
+            "asset": "BTC/USDT",
+            "trade_type": "Spot",
+            "action": "Buy",
+            "confidence_score": 0.95,
+            "time_frame": "1h",
+            "entry_price": "67000.00",
+            "target_price": "69000.00",
+            "stop_loss": "66000.00",
+            "reasoning": [
+                "Bloomberg: Bitcoin ETF inflows hit record",
+                "RSI oversold, MACD bullish crossover",
+                "Reddit sentiment positive",
+                "No dark web threats detected"
+            ],
+            "timestamp": "2024-07-21T12:00:00Z",
+            "source_urls": [
+                "https://tradingview.com/...",
+                "https://binance.com/...",
+                "https://twitter.com/...",
+                "https://cointelegraph.com/news/..."
+            ]
+        },
+        {
+            "asset": "ETH/USDT",
+            "trade_type": "Futures",
+            "action": "Sell",
+            "confidence_score": 0.91,
+            "time_frame": "4h",
+            "entry_price": "3500.00",
+            "target_price": "3200.00",
+            "stop_loss": "3600.00",
+            "reasoning": [
+                "Reuters: Ethereum network congestion rising",
+                "MACD bearish, funding rate negative",
+                "Twitter sentiment negative",
+                "Pump/dump chatter detected on dark web"
+            ],
+            "timestamp": "2024-07-21T12:00:00Z",
+            "source_urls": [
+                "https://tradingview.com/...",
+                "https://bybit.com/...",
+                "https://twitter.com/...",
+                "https://coindesk.com/news/..."
+            ]
+        },
+        # ... add more signals for other trade types and assets ...
+    ]
+    return jsonify(signals)
+
 # --- Test WebSocket Broadcast ---
 @app.route('/api/test-broadcast')
 def test_broadcast():
