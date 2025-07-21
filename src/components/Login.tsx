@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Alert } from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Link, useNavigate } from "react-router-dom";
 
 const Login: React.FC = () => {
@@ -20,7 +20,7 @@ const Login: React.FC = () => {
     setSuccess(false);
     setLoading(true);
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/login`, {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
@@ -86,13 +86,17 @@ const Login: React.FC = () => {
             </Button>
           </form>
           {error && (
-            <Alert variant="destructive" className="mt-2 text-red-200 bg-red-900/80 border-red-400">
-              {error}
+            <Alert variant="destructive" className="mt-2">
+              <AlertDescription>
+                {error}
+              </AlertDescription>
             </Alert>
           )}
           {success && (
-            <Alert variant="default" className="mt-2 text-green-200 bg-green-900/80 border-green-400">
-              Login successful!
+            <Alert variant="default" className="mt-2">
+               <AlertDescription>
+                Login successful!
+               </AlertDescription>
             </Alert>
           )}
           <div className="text-center text-muted-foreground mt-4">

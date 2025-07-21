@@ -7,9 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TrendingUp, TrendingDown, DollarSign, Bot, Target, Activity, Zap } from "lucide-react";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, AreaChart, Area } from "recharts";
 import { useNavigate } from "react-router-dom";
-import dashboardBg from '@/assets/backgrounds/dashboard.jpeg';
 import { useToast } from "@/hooks/use-toast";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import CryptoPrices from '@/components/CryptoPrices';
 import LiveChart from '@/components/LiveChart';
 
@@ -85,86 +84,72 @@ export default function Dashboard() {
   ];
 
   return (
-    <div style={{ position: 'relative', minHeight: '100vh', width: '100%' }}>
-      <div
-        style={{
-          backgroundImage: `url(${dashboardBg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          position: 'absolute',
-          inset: 0,
-          zIndex: 0,
-        }}
-      />
-      <div style={{ position: 'relative', zIndex: 1, fontFamily: 'Inter, Poppins, Satoshi, Arial, sans-serif', color: '#f5f6fa' }}>
-        <div className="min-h-screen bg-background p-6">
-          <div className="max-w-[1800px] mx-auto space-y-6">
-            <CryptoPrices />
-            <LiveChart symbol="BTCUSDT" />
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-foreground">Trading Dashboard</h1>
-                <p className="text-muted-foreground">Monitor your portfolio and trading performance</p>
-              </div>
-              <div className="flex items-center gap-4">
-                <Badge variant={activeBot ? "default" : "secondary"} className="bg-gradient-success cursor-pointer" onClick={() => setShowBotsModal(true)}>
-                  <Bot className="icon h-4 w-4 mr-1" />
-                  Bot {activeBot ? "Active" : "Inactive"}
-                </Badge>
-                <Dialog open={showBotsModal} onOpenChange={setShowBotsModal}>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Active Bots</DialogTitle>
-                    </DialogHeader>
-                    <div>List of active bots and their status will appear here.</div>
-                  </DialogContent>
-                </Dialog>
-                <Button 
-                  variant="default"  /* changed from premium to default */
-                  size="sm" 
-                  onClick={() => navigate('/pricing')}
-                >
-                  <Zap className="icon h-4 w-4 mr-2" />
-                  Upgrade Plan
-                </Button>
-              </div>
-            </div>
-
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {stats.map((stat, index) => (
-                <Card key={index} className="bg-gradient-card border-border/50 shadow-card hover:shadow-glow transition-all duration-300">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">
-                      {stat.title}
-                    </CardTitle>
-                    <stat.icon className="icon h-4 w-4 text-primary" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-foreground">{stat.value}</div>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Badge 
-                        variant={stat.changeType === "positive" ? "default" : "secondary"}
-                        className={stat.changeType === "positive" ? "bg-gradient-success" : ""}
-                      >
-                        {stat.changeType === "positive" ? 
-                          <TrendingUp className="icon h-3 w-3 mr-1" /> : 
-                          <TrendingDown className="icon h-3 w-3 mr-1" />
-                        }
-                        {stat.change}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground">{stat.description}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            {/* Charts Section */}
-            {/* ...rest of your code remains unchanged */}
-
+    <div className="min-h-screen bg-background p-6">
+      <div className="max-w-[1800px] mx-auto space-y-6">
+        <CryptoPrices />
+        <LiveChart symbol="BTCUSDT" />
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Trading Dashboard</h1>
+            <p className="text-muted-foreground">Monitor your portfolio and trading performance</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <Badge variant={activeBot ? "default" : "secondary"} className="bg-gradient-success cursor-pointer" onClick={() => setShowBotsModal(true)}>
+              <Bot className="icon h-4 w-4 mr-1" />
+              Bot {activeBot ? "Active" : "Inactive"}
+            </Badge>
+            <Dialog open={showBotsModal} onOpenChange={setShowBotsModal}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Active Bots</DialogTitle>
+                </DialogHeader>
+                <div>List of active bots and their status will appear here.</div>
+              </DialogContent>
+            </Dialog>
+            <Button 
+              variant="default"  /* changed from premium to default */
+              size="sm" 
+              onClick={() => navigate('/pricing')}
+            >
+              <Zap className="icon h-4 w-4 mr-2" />
+              Upgrade Plan
+            </Button>
           </div>
         </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {stats.map((stat, index) => (
+            <Card key={index} className="bg-gradient-card border-border/50 shadow-card hover:shadow-glow transition-all duration-300">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  {stat.title}
+                </CardTitle>
+                <stat.icon className="icon h-4 w-4 text-primary" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-foreground">{stat.value}</div>
+                <div className="flex items-center gap-2 mt-1">
+                  <Badge 
+                    variant={stat.changeType === "positive" ? "default" : "secondary"}
+                    className={stat.changeType === "positive" ? "bg-gradient-success" : ""}
+                  >
+                    {stat.changeType === "positive" ? 
+                      <TrendingUp className="icon h-3 w-3 mr-1" /> : 
+                      <TrendingDown className="icon h-3 w-3 mr-1" />
+                    }
+                    {stat.change}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground">{stat.description}</span>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Charts Section */}
+        {/* ...rest of your code remains unchanged */}
+
       </div>
     </div>
   );
