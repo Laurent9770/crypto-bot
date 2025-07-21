@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { SymbolSelector } from "@/components/SymbolSelector";
+import { ThumbsUp, ThumbsDown, Bot } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 interface Trader {
   nickName: string;
@@ -28,6 +32,20 @@ interface Backtest {
   trades: any[];
 }
 
+interface AiSignal {
+  asset: string;
+  trade_type: string;
+  action: string;
+  confidence_score: number;
+  time_frame: string;
+  entry_price: string;
+  target_price: string;
+  stop_loss: string;
+  reasoning: string[];
+  timestamp: string;
+  source_urls: string[];
+}
+
 export default function CopyTrading() {
   const [traders, setTraders] = useState<Trader[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,6 +54,8 @@ export default function CopyTrading() {
   const [signalLoading, setSignalLoading] = useState(true);
   const [backtestLoading, setBacktestLoading] = useState(true);
   const [symbol, setSymbol] = useState("BTCUSDT");
+  const [aiSignals, setAiSignals] = useState<AiSignal[]>([]);
+  const [loadingAi, setLoadingAi] = useState(true);
 
   useEffect(() => {
     async function fetchTraders() {
@@ -66,6 +86,14 @@ export default function CopyTrading() {
       .catch(() => setBacktest(null))
       .finally(() => setBacktestLoading(false));
   }, [symbol]);
+
+  useEffect(() => {
+    setLoadingAi(true);
+    axios.get('/api/ai-signals')
+      .then(res => setAiSignals(res.data.filter(s => s.trade_type === 'Copy')))
+      .catch(() => setAiSignals([]))
+      .finally(() => setLoadingAi(false));
+  }, []);
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -142,6 +170,72 @@ export default function CopyTrading() {
             </div>
           )}
         </div>
+
+        <Card className="bg-gradient-card border-border/50 shadow-card mt-8">
+          <CardHeader>
+            <CardTitle className="text-foreground flex items-center gap-2">
+              <Bot className="icon w-6 h-6 text-primary animate-pulse" />
+              AI-Powered Copy Trading Signals
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loadingAi ? (
+              <div>Loading AI signals...</div>
+            ) : (
+              <div className="space-y-4">
+                {aiSignals.map((signal, idx) => (
+                  <div key={idx} className="p-4 rounded-lg border bg-muted/20">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge className={signal.action === 'Buy' ? 'bg-success' : 'bg-destructive'}>
+                            {signal.action}
+                          </Badge>
+                          <span className="font-bold text-lg">{signal.asset}</span>
+                          <span className="text-sm text-muted-foreground">({signal.time_frame})</span>
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Confidence: {(signal.confidence_score * 100).toFixed(0)}%
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button variant="ghost" size="sm"><ThumbsUp className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="sm"><ThumbsDown className="h-4 w-4" /></Button>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 my-4 text-sm">
+                      <div>
+                        <div className="text-muted-foreground">Entry</div>
+                        <div>{signal.entry_price}</div>
+                      </div>
+                      <div>
+                        <div className="text-muted-foreground">Target</div>
+                        <div>{signal.target_price}</div>
+                      </div>
+                      <div>
+                        <div className="text-muted-foreground">Stop Loss</div>
+                        <div>{signal.stop_loss}</div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-muted-foreground text-sm mb-1">Reasoning:</div>
+                      <ul className="list-disc list-inside text-sm space-y-1">
+                        {signal.reasoning.map((reason, i) => <li key={i}>{reason}</li>)}
+                      </ul>
+                    </div>
+                    <div className="mt-4 text-xs text-muted-foreground">
+                      Sources: {signal.source_urls.map((url, i) => (
+                        <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="underline ml-2">
+                          Source {i + 1}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
