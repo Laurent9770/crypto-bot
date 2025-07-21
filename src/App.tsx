@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useState } from 'react';
 import Home from './pages/Home';
 import Spot from './pages/Spot';
 import Futures from './pages/Futures';
@@ -9,11 +10,11 @@ import Copy from './pages/Copy';
 import News from './pages/News';
 import Sentiment from './pages/Sentiment';
 import Header from './components/Header';
-import Footer from './components/Footer';
-
-const queryClient = new QueryClient();
+import { Footer } from './components/Footer';
 
 function App() {
+  const [queryClient] = useState(() => new QueryClient());
+
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
