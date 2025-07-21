@@ -24,29 +24,25 @@ export default function Header() {
                 Trading <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem asChild><Link to="/trading">Main</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/spot">Spot</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/futures">Futures</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/margin">Margin</Link></DropdownMenuItem>
-                <DropdownMenuItem asChild><Link to="/spot">Spot</Link></DropdownMenuItem>
-                <DropdownMenuItem asChild><Link to="/options-signals">Options</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/options">Options</Link></DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
             <Link to="/pricing">Pricing</Link>
-            <Link to="/copy-trading">Copy Trading</Link>
+            <Link to="/copy">Copy Trading</Link>
             
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-1">
                 Resources <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem asChild><Link to="/features">Features</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/news">News</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/sentiment">Sentiment</Link></DropdownMenuItem>
-                <DropdownMenuItem asChild><Link to="/docs">Docs</Link></DropdownMenuItem>
-                <DropdownMenuItem asChild><Link to="/support">Support</Link></DropdownMenuItem>
-                <DropdownMenuItem asChild><Link to="/about">About</Link></DropdownMenuItem>
-                <DropdownMenuItem asChild><Link to="/contact">Contact</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/api-access">API Access</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/help-center">Help Center</Link></DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </nav>

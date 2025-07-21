@@ -291,13 +291,14 @@ export default function Profile() {
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <Smartphone className="icon w-4 h-4 text-primary" />
-                        <Label>Two-Factor Authentication</Label>
+                        <Label htmlFor="twoFactor">Two-Factor Authentication</Label>
                       </div>
                       <p className="text-sm text-muted-foreground">
                         Add an extra layer of security to your account
                       </p>
                     </div>
                     <Switch 
+                      id="twoFactor"
                       checked={twoFactorEnabled} 
                       onCheckedChange={setTwoFactorEnabled}
                       className="data-[state=checked]:bg-primary"
@@ -332,12 +333,13 @@ export default function Profile() {
                 <CardContent className="space-y-6">
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                      <Label>Email Notifications</Label>
+                      <Label htmlFor="emailNotifications">Email Notifications</Label>
                       <p className="text-sm text-muted-foreground">
                         Receive account updates and important information via email
                       </p>
                     </div>
                     <Switch 
+                      id="emailNotifications"
                       checked={emailNotifications} 
                       onCheckedChange={setEmailNotifications}
                       className="data-[state=checked]:bg-primary"
@@ -348,12 +350,13 @@ export default function Profile() {
                   
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                      <Label>Trading Alerts</Label>
+                      <Label htmlFor="tradingAlerts">Trading Alerts</Label>
                       <p className="text-sm text-muted-foreground">
                         Get notified about trade executions and bot activities
                       </p>
                     </div>
                     <Switch 
+                      id="tradingAlerts"
                       checked={tradingAlerts} 
                       onCheckedChange={setTradingAlerts}
                       className="data-[state=checked]:bg-primary"
@@ -364,12 +367,13 @@ export default function Profile() {
                   
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                      <Label>Price Alerts</Label>
+                      <Label htmlFor="priceAlerts">Price Alerts</Label>
                       <p className="text-sm text-muted-foreground">
                         Receive notifications when price targets are reached
                       </p>
                     </div>
                     <Switch 
+                      id="priceAlerts"
                       checked={priceAlerts} 
                       onCheckedChange={setPriceAlerts}
                       className="data-[state=checked]:bg-primary"

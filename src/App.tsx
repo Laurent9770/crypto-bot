@@ -9,6 +9,11 @@ import Margin from './pages/Margin';
 import Copy from './pages/Copy';
 import News from './pages/News';
 import Sentiment from './pages/Sentiment';
+import Dashboard from './pages/Dashboard';
+import Pricing from './pages/Pricing';
+import APIAccess from './pages/APIAccess';
+import HelpCenter from './pages/HelpCenter';
+import Profile from './pages/Profile';
 import Header from './components/Header';
 import { Footer } from './components/Footer';
 
@@ -30,6 +35,11 @@ function App() {
               <Route path="/copy" element={<Copy />} />
               <Route path="/news" element={<News />} />
               <Route path="/sentiment" element={<Sentiment />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/api-access" element={<APIAccess />} />
+              <Route path="/help-center" element={<HelpCenter />} />
+              <Route path="/profile" element={<Profile />} />
             </Routes>
           </main>
           <Footer />

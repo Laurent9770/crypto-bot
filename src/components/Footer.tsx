@@ -28,9 +28,7 @@ export const Footer = () => {
             <h3 className="font-semibold text-foreground">Platform</h3>
             <ul className="space-y-2 text-sm">
               <li><Link to="/dashboard" className="text-muted-foreground hover:text-primary transition-colors">Trading Dashboard</Link></li>
-              <li><Link to="/live-charts" className="text-muted-foreground hover:text-primary transition-colors">Live Charts</Link></li>
-              <li><Link to="/copy-trading" className="text-muted-foreground hover:text-primary transition-colors">Copy Trading</Link></li>
-              <li><Link to="/mobile-app" className="text-muted-foreground hover:text-primary transition-colors">Mobile App</Link></li>
+              <li><Link to="/copy" className="text-muted-foreground hover:text-primary transition-colors">Copy Trading</Link></li>
               <li><Link to="/api-access" className="text-muted-foreground hover:text-primary transition-colors">API Access</Link></li>
             </ul>
           </div>
@@ -40,10 +38,6 @@ export const Footer = () => {
             <h3 className="font-semibold text-foreground">Support</h3>
             <ul className="space-y-2 text-sm">
               <li><Link to="/help-center" className="text-muted-foreground hover:text-primary transition-colors">Help Center</Link></li>
-              <li><Link to="/trading-guide" className="text-muted-foreground hover:text-primary transition-colors">Trading Guide</Link></li>
-              <li><Link to="/documentation" className="text-muted-foreground hover:text-primary transition-colors">Documentation</Link></li>
-              <li><Link to="/community" className="text-muted-foreground hover:text-primary transition-colors">Community</Link></li>
-              <li><Link to="/contact-us" className="text-muted-foreground hover:text-primary transition-colors">Contact Us</Link></li>
             </ul>
           </div>
 

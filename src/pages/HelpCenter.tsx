@@ -1,10 +1,12 @@
 import React from "react";
 
-const HelpCenter: React.FC = () => (
-  <div style={{ padding: 40, textAlign: "center" }}>
-    <h2>Help Center</h2>
-    <p>Find answers to common questions here.</p>
-  </div>
-);
+const HelpCenter = () => {
+  return (
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Help Center</h1>
+      <p>This is a placeholder for the help center and support page.</p>
+    </div>
+  );
+};
 
 export default HelpCenter; 
