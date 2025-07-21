@@ -11,8 +11,8 @@ from pymongo import MongoClient
 from flask_bcrypt import Bcrypt
 import jwt
 import datetime
-from backend.mock_signals import mock_signals
-from backend.mock_data import mock_news, mock_sentiment
+from mock_signals import mock_signals
+from mock_data import mock_news, mock_sentiment
 
 # Use local MongoDB for development
 MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://localhost:27017/')
@@ -21,7 +21,11 @@ DB_NAME = os.environ.get('MONGO_DB', 'crypto_bot')
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'a_very_secret_key_that_should_be_in_env')
 bcrypt = Bcrypt(app)
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins=[
+    "https://initialfrontend.netlify.app",
+    "http://localhost:5173",
+    "http://localhost:5176"
+])
 
 client = MongoClient(MONGO_URI)
 db = client[DB_NAME]
@@ -45,7 +49,10 @@ def fetch_real_news():
 
 def fetch_real_sentiment(asset):
     """Placeholder: Fetch real-time sentiment from social media APIs."""
-    return random.choice([s for s in mock_sentiment if s['asset'] == asset.split('/')[0]])
+    filtered = [s for s in mock_sentiment if s['asset'] == asset.split('/')[0]]
+    if filtered:
+        return random.choice(filtered)
+    return {"asset": asset.split('/')[0], "score": 0.5, "source": "Unknown", "trend": "neutral"}
 
 # --- Real-Time Broadcasting Loops ---
 def signal_broadcast_loop():
@@ -118,4 +125,4 @@ def start_background_threads():
 
 if __name__ == '__main__':
     start_background_threads()
-    socketio.run(app, host='0.0.0.0', port=5000, debug=False)
+    socketio.run(app, host='0.0.0.0', port=5001, debug=False)
