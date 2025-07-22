@@ -1,10 +1,49 @@
 from flask import Blueprint, request, jsonify
 import datetime
+from flask_bcrypt import Bcrypt
+from flask_cors import cross_origin
 
 user_api_bp = Blueprint('user_api', __name__)
 
+# Get bcrypt instance from app context
+from app import app
+bcrypt = Bcrypt(app)
+
+ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "https://initialfrontend.netlify.app",
+    "https://crypto-bot-git-main-laurents-projects-b6d13366.vercel.app/"
+]
+
+@user_api_bp.route('/api/register', methods=['POST', 'OPTIONS'])
+@cross_origin(origins=ALLOWED_ORIGINS, supports_credentials=True)
+def register():
+    from app import db
+    if request.method == 'OPTIONS':
+        return '', 200
+    try:
+        data = request.json
+        username = data.get('username')
+        password = data.get('password')
+        if not username or not password:
+            return jsonify({'error': 'Missing username or password'}), 400
+        if db.users.find_one({'username': username}):
+            return jsonify({'error': 'Username already exists'}), 409
+        password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+        db.users.insert_one({
+            'username': username,
+            'password_hash': password_hash,
+            'created_at': datetime.datetime.utcnow()
+        })
+        return jsonify({'message': 'Registration successful', 'user': username}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @user_api_bp.route('/api/login', methods=['POST', 'OPTIONS'])
+@cross_origin(origins=ALLOWED_ORIGINS, supports_credentials=True)
 def login():
+    from app import db
     if request.method == 'OPTIONS':
         return '', 200  # Respond to CORS preflight
     try:
@@ -13,11 +52,11 @@ def login():
         password = data.get('password')
         if not username or not password:
             return jsonify({'error': 'Missing username or password'}), 400
-        # Dummy authentication for demonstration
-        if username == 'admin' and password == 'admin':
-            return jsonify({'token': 'dummy-jwt-token', 'user': username}), 200
-        else:
+        user = db.users.find_one({'username': username})
+        if not user or not bcrypt.check_password_hash(user['password_hash'], password):
             return jsonify({'error': 'Invalid credentials'}), 401
+        # Dummy JWT token for demonstration
+        return jsonify({'token': 'dummy-jwt-token', 'user': username}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
