@@ -1,7 +1,7 @@
 import React from "react";
 import { useEffect } from "react";
 import { create } from "zustand";
-import io from "socket.io-client";
+import { io } from "socket.io-client";
 
 interface PortfolioState {
   allocation: { asset: string; percent: number }[];
@@ -17,13 +17,18 @@ const usePortfolioStore = create<PortfolioState>((set) => ({
   setPortfolio: (data) => set(data),
 }));
 
+const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://flask-backend.onrender.com';
+
 export function usePortfolio() {
   const setPortfolio = usePortfolioStore((s) => s.setPortfolio);
   useEffect(() => {
     // Initial fetch
     fetch("/api/portfolio").then((res) => res.json()).then((data) => setPortfolio(data));
     // WebSocket for real-time updates
-    const socket = io("/", { transports: ["websocket"] });
+    const socket = io(VITE_BACKEND_URL, {
+      transports: ["websocket"],
+      withCredentials: true,
+    });
     socket.on("portfolio_update", (data) => setPortfolio(data));
     return () => { socket.disconnect(); };
   }, [setPortfolio]);

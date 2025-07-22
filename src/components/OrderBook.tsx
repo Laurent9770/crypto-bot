@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import io, { Socket } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 import { create } from "zustand";
 
 interface OrderBookState {
@@ -14,10 +14,15 @@ const useOrderBookStore = create<OrderBookState>((set) => ({
   setOrderBook: (bids, asks) => set({ bids, asks }),
 }));
 
+const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://flask-backend.onrender.com';
+
 function useOrderBook(symbol: string) {
   const setOrderBook = useOrderBookStore((s) => s.setOrderBook);
   useEffect(() => {
-    const socket: Socket = io("/", { transports: ["websocket"] });
+    const socket: Socket = io(VITE_BACKEND_URL, {
+      transports: ["websocket"],
+      withCredentials: true,
+    });
     socket.emit("subscribe_order_book", { symbol });
     socket.on("order_book_update", (data) => {
       if (data.symbol === symbol) {
