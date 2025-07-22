@@ -1,14 +1,10 @@
 from flask import Blueprint, request, jsonify
 import datetime
-from flask_cors import cross_origin
 
 user_api_bp = Blueprint('user_api', __name__)
 
-@user_api_bp.route('/api/login', methods=['POST', 'OPTIONS'])
-@cross_origin()
+@user_api_bp.route('/api/login', methods=['POST'])
 def login():
-    if request.method == 'OPTIONS':
-        return '', 200  # Handle CORS preflight
     try:
         data = request.json
         username = data.get('username')

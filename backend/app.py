@@ -23,26 +23,29 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # --- Flask setup ---
 app = Flask(__name__)
 app.config['SECRET_KEY'] = SECRET_KEY
-# Explicitly list allowed frontend origins
-ALLOWED_ORIGINS = [
+# Apply CORS globally for all routes and blueprints
+CORS(app, supports_credentials=True, origins=[
     "http://localhost:5173",
     "http://localhost:5176",
     "https://initialfrontend.netlify.app",
-    "https://crypto-bot-git-main-laurents-projects-b6d13366.vercel.app/"  # Add your deployed frontend domain here
-]
-CORS(app, supports_credentials=True, origins=ALLOWED_ORIGINS)
+    "https://crypto-bot-git-main-laurents-projects-b6d13366.vercel.app/"
+])
 Bcrypt(app)
 socketio = SocketIO(app, cors_allowed_origins=ALLOWED_ORIGINS, async_mode='eventlet')
 
 # --- MongoDB setup ---
-# If running locally, use: mongodb://localhost:27017/
-# If using Atlas, ensure your URI is correct and DNS/network allows access
 try:
-    client = MongoClient(MONGO_URI)
+    client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+    # Attempt to force connection on a request as the
+    # connect=True parameter of MongoClient seems
+    # to be useless here
+    client.admin.command('ping')
     db = client[DB_NAME]
+    logging.info("MongoDB connection established successfully.")
 except Exception as e:
     logging.error(f"MongoDB connection failed: {e}\nCheck your MONGO_URI in .env and your network/DNS settings.")
-    raise
+    print(f"[FATAL] MongoDB connection failed: {e}", file=sys.stderr)
+    sys.exit(1)
 
 # --- Import blueprints ---
 from blueprints.options_signals import options_bp
