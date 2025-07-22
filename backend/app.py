@@ -23,13 +23,14 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # --- Flask setup ---
 app = Flask(__name__)
 app.config['SECRET_KEY'] = SECRET_KEY
-# Apply CORS globally for all routes and blueprints
-CORS(app, supports_credentials=True, origins=[
+ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:5176",
     "https://initialfrontend.netlify.app",
-    "https://crypto-bot-git-main-laurents-projects-b6d13366.vercel.app/"
-])
+    "https://crypto-bot-git-main-laurents-projects-b6d13366.vercel.app"
+]
+# Apply CORS globally for all routes and blueprints
+CORS(app, supports_credentials=True, origins=ALLOWED_ORIGINS)
 Bcrypt(app)
 socketio = SocketIO(app, cors_allowed_origins=ALLOWED_ORIGINS, async_mode='eventlet')
 
