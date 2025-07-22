@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react';
-import io from 'socket.io-client';
+import { io } from 'socket.io-client';
 import { NewsCard, NewsArticle } from '@/components/NewsCard';
 
-const socket = io('http://localhost:5000');
+const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://flask-backend.onrender.com';
+const socket = io(VITE_BACKEND_URL, {
+  transports: ["websocket"],
+  withCredentials: true,
+});
 
 const News = () => {
   const [articles, setArticles] = useState<NewsArticle[]>([]);

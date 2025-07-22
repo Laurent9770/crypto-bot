@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import { SignalCard, TradingSignal } from "@/components/trading/SignalCard";
-import io from "socket.io-client";
+import { io } from "socket.io-client";
 
-const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
-const socket = io(VITE_BACKEND_URL);
+const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://flask-backend.onrender.com';
+const socket = io(VITE_BACKEND_URL, {
+  transports: ["websocket"],
+  withCredentials: true,
+});
 
 const Spot = () => {
   const [signals, setSignals] = useState<TradingSignal[] | null>(null);

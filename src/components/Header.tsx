@@ -18,6 +18,8 @@ export default function Header() {
           </Link>
           <nav className="flex items-center gap-6 text-sm">
             <Link to="/dashboard">Dashboard</Link>
+            <Link to="/settings">Settings</Link>
+            <Link to="/performance">Performance</Link>
             
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-1">
@@ -28,11 +30,14 @@ export default function Header() {
                 <DropdownMenuItem asChild><Link to="/futures">Futures</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/margin">Margin</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/options">Options</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/copy">Copy Trading</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/features">Features</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/option-signals">Option Signals</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/option-insight">Option Insight</Link></DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
             <Link to="/pricing">Pricing</Link>
-            <Link to="/copy">Copy Trading</Link>
             
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-1">

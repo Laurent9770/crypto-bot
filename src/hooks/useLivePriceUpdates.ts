@@ -1,18 +1,19 @@
 import { useEffect } from 'react';
-import { Socket as IOSocket, connect } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import { usePriceStore } from '../state/usePriceStore';
 
-let socket: typeof IOSocket | null = null;
+let socket: Socket | null = null;
 
 export function useLivePriceUpdates() {
   const setPrices = usePriceStore((s) => s.setPrices);
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://crypto-bot-backend.onrender.com';
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://flask-backend.onrender.com';
 
   useEffect(() => {
     if (!socket) {
       // Configure socket with proper options
-      socket = connect(BACKEND_URL, {
+      socket = io(BACKEND_URL, {
         transports: ['websocket'],
+        withCredentials: true,
         secure: true,
         rejectUnauthorized: false,
         reconnection: true,
