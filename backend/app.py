@@ -25,9 +25,9 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = SECRET_KEY
 ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "http://localhost:5176",
+    "http://localhost:5174",
     "https://initialfrontend.netlify.app",
-    "https://crypto-bot-git-main-laurents-projects-b6d13366.vercel.app"
+    "https://crypto-bot-git-main-laurents-projects-b6d13366.vercel.app/"
 ]
 # Apply CORS globally for all routes and blueprints
 CORS(app, supports_credentials=True, origins=ALLOWED_ORIGINS)
